@@ -1,0 +1,58 @@
+{
+  "name": "@byarcadia-app/plutus",
+  "version": "0.1.0",
+  "description": "Reusable RevenueCat wrapper for React Native in-app purchases",
+  "keywords": ["react-native", "revenuecat", "in-app-purchases", "subscriptions"],
+  "homepage": "https://github.com/byarcadia-app/plutus#readme",
+  "license": "MIT",
+  "author": "Dominik Woźniak <dominik@byarcadia.app> (github.com/dominikwozniak)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/byarcadia-app/plutus"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "release": "pnpm build && changeset publish",
+    "version": "changeset version",
+    "check": "tsc --noEmit",
+    "lint": "oxlint .",
+    "fmt": "oxfmt .",
+    "fmt:check": "oxfmt --check .",
+    "example:start": "pnpm --filter @byarcadia-app/plutus-example start",
+    "example:ios": "pnpm --filter @byarcadia-app/plutus-example ios"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.5.2",
+    "@changesets/cli": "^2.29.8",
+    "@types/react": "^19.2.14",
+    "oxfmt": "^0.34.0",
+    "oxlint": "^1.49.0",
+    "react": "^19.2.4",
+    "react-native": "^0.84.0",
+    "react-native-purchases": "^8.0.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native": ">=0.72",
+    "react-native-purchases": ">=8"
+  },
+  "packageManager": "pnpm@10.14.0"
+}
