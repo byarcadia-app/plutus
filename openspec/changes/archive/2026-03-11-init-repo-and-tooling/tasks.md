@@ -28,4 +28,4 @@
 
 ## 5. Push to Remote
 
-- [ ] 5.1 Stage all files, create initial commit, push to `main` branch on GitHub
+- [x] 5.1 Stage all files, create initial commit, push to `main` branch on GitHub
