@@ -8,8 +8,8 @@ export { usePaywall } from "./hooks/use-paywall";
 export { useRescuePaywall } from "./hooks/use-rescue-paywall";
 
 // Errors
-export { PlutusError } from "./errors";
-export type { PlutusErrorCode } from "./errors";
+export { errors } from "./errors";
+export type { PlutusError, PlutusErrorCode } from "./errors";
 
 // Types
 export type { PlutusConfig } from "./types";

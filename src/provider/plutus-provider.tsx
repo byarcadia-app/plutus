@@ -7,7 +7,7 @@ import Purchases, {
   type PurchasesPackage,
 } from "react-native-purchases";
 
-import { PlutusError } from "../errors";
+import { errors, type PlutusError } from "../errors";
 import { defaultTranslations } from "../translations";
 import type { PlutusConfig } from "../types";
 
@@ -103,7 +103,7 @@ export const PlutusProvider = ({
 
         setIsReady(true);
       } catch (error) {
-        callbacks?.onError?.(PlutusError.initFailed(error));
+        callbacks?.onError?.(errors.INIT_FAILED(error));
       }
     };
 
@@ -131,7 +131,7 @@ export const PlutusProvider = ({
           return undefined;
         }
 
-        callbacks?.onError?.(PlutusError.purchaseFailed(error, pack));
+        callbacks?.onError?.(errors.PURCHASE_FAILED(error, pack));
 
         return undefined;
       }
@@ -148,7 +148,7 @@ export const PlutusProvider = ({
         customerInfo.entitlements.active?.[entitlementName] !== undefined
       );
     } catch (error) {
-      callbacks?.onError?.(PlutusError.restoreFailed(error));
+      callbacks?.onError?.(errors.RESTORE_FAILED(error));
 
       return false;
     }

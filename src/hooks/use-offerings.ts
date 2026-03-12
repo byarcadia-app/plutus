@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Purchases, { type PurchasesPackage } from "react-native-purchases";
 
-import { PlutusError } from "../errors";
+import { errors } from "../errors";
 import { usePlutus } from "../provider/use-plutus";
 
 interface UseOfferingsOptions {
@@ -100,7 +100,7 @@ export const useOfferings = (options?: UseOfferingsOptions) => {
         ),
       );
     } catch (error) {
-      onError?.(PlutusError.offeringsFailed(error));
+      onError?.(errors.OFFERINGS_FAILED(error));
     }
   };
 
