@@ -1,15 +1,4 @@
-export interface PlutusTranslations {
-  purchaseError: {
-    title: string;
-    message: string;
-  };
-  restoreError: {
-    title: string;
-    message: string;
-  };
-}
-
-export const defaultTranslations: PlutusTranslations = {
+export const defaultTranslations = {
   purchaseError: {
     title: "Purchase Error",
     message: "There was a problem processing your purchase. Please try again.",
@@ -20,3 +9,5 @@ export const defaultTranslations: PlutusTranslations = {
       "There was a problem restoring your purchases. Please try again.",
   },
 };
+
+export type PlutusTranslations = typeof defaultTranslations
