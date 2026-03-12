@@ -1,9 +1,8 @@
 import { use } from "react";
 
-import type { PlutusContextValue } from "../types";
 import { PlutusContext } from "./plutus-provider";
 
-export const usePlutus = (): PlutusContextValue => {
+export const usePlutus = () => {
   const context = use(PlutusContext);
 
   if (!context) {

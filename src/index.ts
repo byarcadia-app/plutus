@@ -7,16 +7,10 @@ export { useOfferings } from "./hooks/use-offerings";
 export { usePaywall } from "./hooks/use-paywall";
 export { useRescuePaywall } from "./hooks/use-rescue-paywall";
 
-// Types
-export type {
-  PlutusConfig,
-  PlutusCallbacks,
-  PlutusOfferingsConfig,
-  PlutusContextValue,
-  PlutusError,
-  PlutusErrorCode,
-  UsePaywallOptions,
-  UseRescuePaywallOptions,
-} from "./types";
+// Errors
+export { PlutusError } from "./errors";
+export type { PlutusErrorCode } from "./errors";
 
+// Types
+export type { PlutusConfig } from "./types";
 export type { PlutusTranslations } from "./translations";

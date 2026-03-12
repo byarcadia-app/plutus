@@ -1,5 +1,4 @@
 import { createContext, useCallback, useEffect, useMemo, useState } from "react";
-import { Platform } from "react-native";
 import Purchases, {
   type CustomerInfo,
   LOG_LEVEL,
@@ -8,8 +7,22 @@ import Purchases, {
   type PurchasesPackage,
 } from "react-native-purchases";
 
+import { PlutusError } from "../errors";
 import { defaultTranslations } from "../translations";
-import type { PlutusConfig, PlutusContextValue } from "../types";
+import type { PlutusConfig } from "../types";
+
+export interface PlutusContextValue {
+  isPro: boolean;
+  isInTrial: boolean;
+  isReady: boolean;
+  managementURL: string | null;
+  purchasePackage: (pack: PurchasesPackage) => Promise<boolean | undefined>;
+  restorePurchases: () => Promise<boolean>;
+  translations: typeof defaultTranslations;
+  onTrackEvent?: (name: string, params?: Record<string, unknown>) => void;
+  onError?: (error: PlutusError) => void;
+  offeringsConfig: { default: string; rescue: string };
+}
 
 export const PlutusContext = createContext<PlutusContextValue | null>(null);
 
@@ -82,20 +95,7 @@ export const PlutusProvider = ({
 
     const init = async () => {
       try {
-        const resolvedKey =
-          typeof apiKey === "string"
-            ? apiKey
-            : Platform.OS === "ios"
-              ? apiKey.apple
-              : apiKey.google;
-
-        if (!resolvedKey) {
-          throw new Error(
-            `No API key provided for platform: ${Platform.OS}`,
-          );
-        }
-
-        Purchases.configure({ apiKey: resolvedKey });
+        Purchases.configure({ apiKey });
 
         await Purchases.setLogLevel(logLevel ?? LOG_LEVEL.ERROR);
 
@@ -103,10 +103,7 @@ export const PlutusProvider = ({
 
         setIsReady(true);
       } catch (error) {
-        callbacks?.onError?.({
-          code: "INIT_FAILED",
-          originalError: error,
-        });
+        callbacks?.onError?.(PlutusError.initFailed(error));
       }
     };
 
@@ -134,11 +131,7 @@ export const PlutusProvider = ({
           return undefined;
         }
 
-        callbacks?.onError?.({
-          code: "PURCHASE_FAILED",
-          originalError: error,
-          package: pack,
-        });
+        callbacks?.onError?.(PlutusError.purchaseFailed(error, pack));
 
         return undefined;
       }
@@ -155,10 +148,7 @@ export const PlutusProvider = ({
         customerInfo.entitlements.active?.[entitlementName] !== undefined
       );
     } catch (error) {
-      callbacks?.onError?.({
-        code: "RESTORE_FAILED",
-        originalError: error,
-      });
+      callbacks?.onError?.(PlutusError.restoreFailed(error));
 
       return false;
     }

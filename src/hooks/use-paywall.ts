@@ -1,8 +1,20 @@
 import { Linking } from "react-native";
 import { useState } from "react";
+import type { PurchasesPackage } from "react-native-purchases";
 
 import { usePlutus } from "../provider/use-plutus";
-import type { UsePaywallOptions } from "../types";
+
+interface UsePaywallOptions {
+  monthlyOffer?: PurchasesPackage;
+  annualOffer?: PurchasesPackage;
+  onClose?: () => void;
+  onPurchaseSuccess?: (subscriptionType: "monthly" | "annual") => void;
+  onPurchaseFailed?: () => void;
+  onRestoreSuccess?: () => void;
+  onRestoreFailed?: () => void;
+  termsUrl?: string;
+  privacyUrl?: string;
+}
 
 export const usePaywall = ({
   monthlyOffer,
@@ -12,17 +24,10 @@ export const usePaywall = ({
   onPurchaseFailed,
   onRestoreSuccess,
   onRestoreFailed,
-  onTrackEvent: hookTrackEvent,
   termsUrl,
   privacyUrl,
 }: UsePaywallOptions) => {
-  const {
-    restorePurchases,
-    purchasePackage,
-    onTrackEvent: providerTrackEvent,
-  } = usePlutus();
-
-  const trackEvent = hookTrackEvent ?? providerTrackEvent;
+  const { restorePurchases, purchasePackage, onTrackEvent } = usePlutus();
 
   const [subscriptionType, setSubscriptionType] = useState<
     "monthly" | "annual"
@@ -30,22 +35,22 @@ export const usePaywall = ({
   const [isPurchasing, setIsPurchasing] = useState(false);
 
   const handleSubscriptionTypeChange = (type: "monthly" | "annual") => {
-    trackEvent?.("paywall_subscription_type_changed", { type });
+    onTrackEvent?.("paywall_subscription_type_changed", { type });
     setSubscriptionType(type);
   };
 
   const handleRestorePurchases = async () => {
-    trackEvent?.("paywall_restore_purchases");
+    onTrackEvent?.("paywall_restore_purchases");
     setIsPurchasing(true);
 
     try {
       const restored = await restorePurchases();
 
       if (restored) {
-        trackEvent?.("paywall_restore_purchases_success");
+        onTrackEvent?.("paywall_restore_purchases_success");
         onRestoreSuccess?.();
       } else {
-        trackEvent?.("paywall_restore_failed");
+        onTrackEvent?.("paywall_restore_failed");
         onRestoreFailed?.();
       }
     } finally {
@@ -58,7 +63,7 @@ export const usePaywall = ({
 
     try {
       setIsPurchasing(true);
-      trackEvent?.("paywall_purchase_package", {
+      onTrackEvent?.("paywall_purchase_package", {
         type: subscriptionType,
         is_rescue_offer: false,
       });
@@ -68,13 +73,13 @@ export const usePaywall = ({
       const purchased = await purchasePackage(selectedOffer);
 
       if (purchased) {
-        trackEvent?.("paywall_purchase_success", {
+        onTrackEvent?.("paywall_purchase_success", {
           type: subscriptionType,
           is_rescue_offer: false,
         });
         onPurchaseSuccess?.(subscriptionType);
       } else {
-        trackEvent?.("paywall_purchase_failed");
+        onTrackEvent?.("paywall_purchase_failed");
         onPurchaseFailed?.();
       }
     } finally {
@@ -83,19 +88,19 @@ export const usePaywall = ({
   };
 
   const handleClosePress = () => {
-    trackEvent?.("paywall_close_button_pressed", {
+    onTrackEvent?.("paywall_close_button_pressed", {
       is_rescue_offer: false,
     });
     onClose?.();
   };
 
   const handleTermsPress = () => {
-    trackEvent?.("paywall_terms_pressed");
+    onTrackEvent?.("paywall_terms_pressed");
     if (termsUrl) Linking.openURL(termsUrl);
   };
 
   const handlePrivacyPress = () => {
-    trackEvent?.("paywall_privacy_pressed");
+    onTrackEvent?.("paywall_privacy_pressed");
     if (privacyUrl) Linking.openURL(privacyUrl);
   };
 
