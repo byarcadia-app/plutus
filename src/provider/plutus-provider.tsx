@@ -70,8 +70,7 @@ export const PlutusProvider = ({
 
   const updateCustomerInformation = useCallback(
     (customerInfo: CustomerInfo) => {
-      const entitlement =
-        customerInfo?.entitlements.active?.[entitlementName];
+      const entitlement = customerInfo?.entitlements.active?.[entitlementName];
 
       const newIsPro = entitlement !== undefined;
       const newIsInTrial = entitlement?.periodType === "TRIAL";
@@ -95,9 +94,9 @@ export const PlutusProvider = ({
 
     const init = async () => {
       try {
-        Purchases.configure({ apiKey });
-
         await Purchases.setLogLevel(logLevel ?? LOG_LEVEL.ERROR);
+
+        Purchases.configure({ apiKey });
 
         Purchases.addCustomerInfoUpdateListener(customerInfoUpdateListener);
 
@@ -120,10 +119,7 @@ export const PlutusProvider = ({
         const result = await Purchases.purchasePackage(pack);
         updateCustomerInformation(result.customerInfo);
 
-        return (
-          result.customerInfo.entitlements.active?.[entitlementName] !==
-          undefined
-        );
+        return result.customerInfo.entitlements.active?.[entitlementName] !== undefined;
       } catch (error: unknown) {
         const errorCode = (error as PurchasesError)?.code;
 
@@ -144,9 +140,7 @@ export const PlutusProvider = ({
       const customerInfo = await Purchases.restorePurchases();
       updateCustomerInformation(customerInfo);
 
-      return (
-        customerInfo.entitlements.active?.[entitlementName] !== undefined
-      );
+      return customerInfo.entitlements.active?.[entitlementName] !== undefined;
     } catch (error) {
       callbacks?.onError?.(errors.RESTORE_FAILED(error));
 
@@ -181,7 +175,5 @@ export const PlutusProvider = ({
     ],
   );
 
-  return (
-    <PlutusContext.Provider value={value}>{children}</PlutusContext.Provider>
-  );
+  return <PlutusContext.Provider value={value}>{children}</PlutusContext.Provider>;
 };

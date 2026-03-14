@@ -17,10 +17,7 @@ const calculateAnnualDiscount = (
   monthlyOffer?: PurchasesPackage,
   annualOffer?: PurchasesPackage,
 ): number | undefined => {
-  if (
-    !monthlyOffer?.product?.pricePerYear ||
-    !annualOffer?.product?.pricePerYear
-  ) {
+  if (!monthlyOffer?.product?.pricePerYear || !annualOffer?.product?.pricePerYear) {
     return undefined;
   }
 
@@ -41,10 +38,7 @@ const calculateRescueOffsetDiscount = (
   rescueOffer?: PurchasesPackage,
   annualOffer?: PurchasesPackage,
 ): number | undefined => {
-  if (
-    !rescueOffer?.product?.pricePerYear ||
-    !annualOffer?.product?.pricePerYear
-  ) {
+  if (!rescueOffer?.product?.pricePerYear || !annualOffer?.product?.pricePerYear) {
     return undefined;
   }
 
@@ -65,40 +59,24 @@ export const useOfferings = (options?: UseOfferingsOptions) => {
   const { isReady, offeringsConfig, onError } = usePlutus();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [monthlyOffer, setMonthlyOffer] = useState<
-    PurchasesPackage | undefined
-  >();
-  const [annualOffer, setAnnualOffer] = useState<
-    PurchasesPackage | undefined
-  >();
-  const [rescueOffer, setRescueOffer] = useState<
-    PurchasesPackage | undefined
-  >();
+  const [monthlyOffer, setMonthlyOffer] = useState<PurchasesPackage | undefined>();
+  const [annualOffer, setAnnualOffer] = useState<PurchasesPackage | undefined>();
+  const [rescueOffer, setRescueOffer] = useState<PurchasesPackage | undefined>();
 
   const loadOfferings = async () => {
     try {
       const offerings = await Purchases.getOfferings();
 
-      const defaultPackages =
-        offerings?.all?.[offeringsConfig.default]?.availablePackages;
-      const rescuePackages =
-        offerings?.all?.[offeringsConfig.rescue]?.availablePackages;
+      const defaultPackages = offerings?.all?.[offeringsConfig.default]?.availablePackages;
+      const rescuePackages = offerings?.all?.[offeringsConfig.rescue]?.availablePackages;
 
       setMonthlyOffer(
-        defaultPackages?.find(
-          (pkg: PurchasesPackage) => pkg.packageType === "MONTHLY",
-        ),
+        defaultPackages?.find((pkg: PurchasesPackage) => pkg.packageType === "MONTHLY"),
       );
       setAnnualOffer(
-        defaultPackages?.find(
-          (pkg: PurchasesPackage) => pkg.packageType === "ANNUAL",
-        ),
+        defaultPackages?.find((pkg: PurchasesPackage) => pkg.packageType === "ANNUAL"),
       );
-      setRescueOffer(
-        rescuePackages?.find(
-          (pkg: PurchasesPackage) => pkg.packageType === "ANNUAL",
-        ),
-      );
+      setRescueOffer(rescuePackages?.find((pkg: PurchasesPackage) => pkg.packageType === "ANNUAL"));
     } catch (error) {
       onError?.(errors.OFFERINGS_FAILED(error));
     }
@@ -112,15 +90,9 @@ export const useOfferings = (options?: UseOfferingsOptions) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isReady, options?.refetchKey]);
 
-  const monthlyHasTrial = useMemo(
-    () => hasFreeTrial(monthlyOffer),
-    [monthlyOffer],
-  );
+  const monthlyHasTrial = useMemo(() => hasFreeTrial(monthlyOffer), [monthlyOffer]);
 
-  const annualHasTrial = useMemo(
-    () => hasFreeTrial(annualOffer),
-    [annualOffer],
-  );
+  const annualHasTrial = useMemo(() => hasFreeTrial(annualOffer), [annualOffer]);
 
   const annualDiscountPercentage = useMemo(
     () => calculateAnnualDiscount(monthlyOffer, annualOffer),
