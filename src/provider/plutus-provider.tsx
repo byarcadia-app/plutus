@@ -94,7 +94,9 @@ export const PlutusProvider = ({
 
     const init = async () => {
       if (!apiKey || !apiKey.trim()) {
-        callbacks?.onError?.(errors.INIT_FAILED(new Error("Plutus: apiKey must not be empty. SDK not initialized.")));
+        callbacks?.onError?.(
+          errors.INIT_FAILED(new Error("Plutus: apiKey must not be empty. SDK not initialized.")),
+        );
         return;
       }
 
