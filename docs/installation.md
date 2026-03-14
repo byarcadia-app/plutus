@@ -11,10 +11,12 @@ pnpm add @byarcadia-app/plutus
 ### 2. Install peer dependency
 
 ```bash
-pnpm add react-native-purchases
+pnpm add react-native-purchases   # v9+ required
 ```
 
 Follow [RevenueCat's setup guide](https://docs.revenuecat.com/docs/getting-started) for native configuration (App Store Connect, Play Console, API keys).
+
+> **Tip:** For development and testing, you can use a RevenueCat [Test Store](https://www.revenuecat.com/docs/test-store) API key (prefixed with `test_`). This lets you test purchases without App Store Connect sandbox setup — just configure the Test Store in your RevenueCat dashboard.
 
 ## Quick Start
 

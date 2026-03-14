@@ -5,7 +5,7 @@
 
 ## 2. Example App Scaffolding
 
-- [x] 2.1 Create `example/package.json` with dependencies: `@byarcadia-app/plutus` (workspace:*), `@byarcadia-app/aether`, `react-native-purchases`, Expo 54, Expo Router, React 19, React Native, NativeWind, and related deps
+- [x] 2.1 Create `example/package.json` with dependencies: `@byarcadia-app/plutus` (workspace:\*), `@byarcadia-app/aether`, `react-native-purchases`, Expo 54, Expo Router, React 19, React Native, NativeWind, and related deps
 - [x] 2.2 Create `example/app.json` with Expo config (name, slug, scheme, plugins for expo-router and expo-font)
 - [x] 2.3 Create `example/tsconfig.json` extending `expo/tsconfig.base` with `~/*` path alias
 - [x] 2.4 Create `example/babel.config.js` with nativewind jsxImportSource and module-resolver for `~` alias

@@ -9,10 +9,18 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.arcadia.plutus-example"
+      "bundleIdentifier": "com.domwozniak.plutus-example",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "plugins": [
-      ["expo-router", { "root": "./src/app" }],
+      [
+        "expo-router",
+        {
+          "root": "./src/app"
+        }
+      ],
       [
         "expo-dev-client",
         {
@@ -23,6 +31,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "root": "./src/app"
+      },
+      "eas": {
+        "projectId": "2ed1ab64-95aa-420b-adbe-79a0f746b8a2"
+      }
+    },
+    "owner": "dominikwozniak"
   }
 }

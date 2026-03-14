@@ -5,9 +5,11 @@ The release workflow runs on every push to `main` and attempts to use changesets
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Stop the release workflow from running until the package is ready to publish
 
 **Non-Goals:**
+
 - Fixing the release workflow itself
 - Publishing the package
 

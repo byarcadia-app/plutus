@@ -3,6 +3,7 @@
 Plutus has no AGENTS.md or CLAUDE.md. The sibling project `@byarcadia-app/aether` has a comprehensive AGENTS.md (286 lines) covering its full component system. Plutus is simpler (~8 source files, 3 hooks) and needs a leaner guide following the "ruthlessly minimal" approach from the aihero.dev AGENTS.md guide.
 
 The key conventions to capture are:
+
 - Validation pipeline (typecheck, lint, fmt, build + example typecheck)
 - Changeset workflow (every code change needs one)
 - Example app as source of truth (API changes must be reflected)
@@ -11,11 +12,13 @@ The key conventions to capture are:
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Provide AI agents with enough context to work correctly on the project
 - Enforce validation, changeset, and example sync habits
 - Keep it minimal — progressive disclosure via CONTRIBUTING.md and example/AGENTS.md
 
 **Non-Goals:**
+
 - Documenting full directory structure (only 8 source files, discoverable)
 - Duplicating CONTRIBUTING.md content (link to it instead)
 - Setting up docs/ infrastructure (future work)

@@ -16,12 +16,14 @@ React Native apps with in-app purchases require repetitive RevenueCat setup — 
 ## Capabilities
 
 ### New Capabilities
+
 - `provider-and-init`: PlutusProvider setup, RevenueCat SDK configuration, customer info listener, entitlement state management
 - `purchase-flow`: Package purchasing, restore purchases, error handling with configurable callbacks
 - `offerings`: Loading and exposing RevenueCat offerings with discount calculations
 - `paywall-hooks`: usePaywall and useRescuePaywall hooks for orchestrating paywall purchase UX with configurable callbacks
 
 ### Modified Capabilities
+
 <!-- No existing capabilities to modify — this is a new package -->
 
 ## Impact

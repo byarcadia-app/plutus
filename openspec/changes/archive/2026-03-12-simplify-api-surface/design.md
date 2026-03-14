@@ -5,12 +5,14 @@ Plutus has no consumers yet, so breaking changes are free. The current API has s
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Simpler, more consistent error handling via a proper Error class
 - Reduce exported types to only what consumers actually need
 - Remove Android/platform branching (iOS-only target)
 - Single source of truth for event tracking (provider only)
 
 **Non-Goals:**
+
 - Changing hook behavior or offerings logic
 - Changing translation system (manual spread is fine)
 - Adding new features
@@ -35,6 +37,7 @@ class PlutusError extends Error {
 ```
 
 Why class over plain objects:
+
 - `instanceof` checks in consumer error handlers
 - Stack traces via `Error` base
 - Factory methods are self-documenting and enforce correct shape

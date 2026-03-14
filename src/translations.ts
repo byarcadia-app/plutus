@@ -5,9 +5,8 @@ export const defaultTranslations = {
   },
   restoreError: {
     title: "Restore Error",
-    message:
-      "There was a problem restoring your purchases. Please try again.",
+    message: "There was a problem restoring your purchases. Please try again.",
   },
 };
 
-export type PlutusTranslations = typeof defaultTranslations
+export type PlutusTranslations = typeof defaultTranslations;

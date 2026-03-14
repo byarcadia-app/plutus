@@ -17,9 +17,11 @@
 ## Capabilities
 
 ### New Capabilities
+
 <!-- No new code capabilities — this is repo/tooling setup only -->
 
 ### Modified Capabilities
+
 <!-- None -->
 
 ## Impact

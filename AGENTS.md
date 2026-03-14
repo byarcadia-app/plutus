@@ -5,7 +5,7 @@ RevenueCat wrapper for React Native in-app purchases. Callback-driven, zero app-
 ## Tech Stack
 
 - TypeScript (strict), React 19, React Native 0.81
-- react-native-purchases (RevenueCat)
+- react-native-purchases v9+ (RevenueCat)
 - tsup (CJS + ESM + DTS)
 - oxlint / oxfmt
 - changesets (versioning)
@@ -13,14 +13,14 @@ RevenueCat wrapper for React Native in-app purchases. Callback-driven, zero app-
 
 ## Scripts
 
-| Command          | Description                        |
-| ---------------- | ---------------------------------- |
+| Command          | Description                       |
+| ---------------- | --------------------------------- |
 | `pnpm build`     | Build with tsup (CJS + ESM + DTS) |
-| `pnpm dev`       | Build in watch mode                |
-| `pnpm check`     | TypeScript type checking           |
-| `pnpm lint`      | Lint with oxlint                   |
-| `pnpm fmt`       | Format with oxfmt                  |
-| `pnpm fmt:check` | Check formatting                   |
+| `pnpm dev`       | Build in watch mode               |
+| `pnpm check`     | TypeScript type checking          |
+| `pnpm lint`      | Lint with oxlint                  |
+| `pnpm fmt`       | Format with oxfmt                 |
+| `pnpm fmt:check` | Check formatting                  |
 
 ## Validation
 

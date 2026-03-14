@@ -44,7 +44,7 @@ pnpm example:ios      # Run on iOS simulator
 | ---------------------- | ------- |
 | React                  | >= 18   |
 | React Native           | >= 0.72 |
-| react-native-purchases | >= 8    |
+| react-native-purchases | >= 9    |
 
 ## License
 

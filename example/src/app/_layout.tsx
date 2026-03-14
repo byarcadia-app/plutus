@@ -35,7 +35,7 @@ export default function RootLayout() {
         apiKey={process.env.EXPO_PUBLIC_REVENUECAT_KEY ?? ""}
         entitlementName="Pro"
         callbacks={{
-          onError: (error) => console.warn("[Plutus Error]", error.code, error.originalError),
+          onError: (error) => console.warn("[Plutus Error]", error.code, error.cause),
           onTrackEvent: (name, params) => console.log("[Plutus Event]", name, params),
         }}
       >

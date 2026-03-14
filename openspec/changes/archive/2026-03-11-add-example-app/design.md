@@ -5,12 +5,14 @@ Plutus is a standalone library (`@byarcadia-app/plutus`) that wraps RevenueCat f
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Provide a runnable Expo example app that demonstrates Plutus integration end-to-end
 - Follow the same workspace + example app pattern as aether-ui
 - Show minimal but complete paywall flow: provider setup → offerings display → purchase
 - Use aether-ui design system for consistent styling (NativeWind + `@byarcadia-app/aether`)
 
 **Non-Goals:**
+
 - Production-ready paywall UI (this is a demo, we'll iterate)
 - Storybook integration (can be added later)
 - Rescue paywall demonstration (keep it minimal for v1)

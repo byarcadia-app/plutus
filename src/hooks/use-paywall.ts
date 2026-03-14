@@ -29,9 +29,7 @@ export const usePaywall = ({
 }: UsePaywallOptions) => {
   const { restorePurchases, purchasePackage, onTrackEvent } = usePlutus();
 
-  const [subscriptionType, setSubscriptionType] = useState<
-    "monthly" | "annual"
-  >("annual");
+  const [subscriptionType, setSubscriptionType] = useState<"monthly" | "annual">("annual");
   const [isPurchasing, setIsPurchasing] = useState(false);
 
   const handleSubscriptionTypeChange = (type: "monthly" | "annual") => {
@@ -68,8 +66,7 @@ export const usePaywall = ({
         is_rescue_offer: false,
       });
 
-      const selectedOffer =
-        subscriptionType === "monthly" ? monthlyOffer : annualOffer;
+      const selectedOffer = subscriptionType === "monthly" ? monthlyOffer : annualOffer;
       const purchased = await purchasePackage(selectedOffer);
 
       if (purchased) {

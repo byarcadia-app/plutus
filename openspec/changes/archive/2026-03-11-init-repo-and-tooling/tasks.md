@@ -2,7 +2,7 @@
 
 - [x] 1.1 Initialize git repo (`git init`), create initial commit with existing source code
 - [x] 1.2 Add remote `origin` pointing to `git@github.com:byarcadia-app/plutus.git`
-- [x] 1.3 Create `.gitignore` matching aether conventions (node_modules, dist, .env*, .DS_Store, coverage, .expo, etc.)
+- [x] 1.3 Create `.gitignore` matching aether conventions (node_modules, dist, .env\*, .DS_Store, coverage, .expo, etc.)
 
 ## 2. Root Config Files
 

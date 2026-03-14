@@ -5,11 +5,13 @@ Current `PlutusError` is a class with static factory methods. This is overengine
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Drop the class entirely — plain objects + interface
 - Ergonomic namespace API: `errors.INIT_FAILED(cause)`
 - Consistent with factory-function error patterns in other byarcadia packages
 
 **Non-Goals:**
+
 - Changing error codes or error behavior
 - Adding error processing/diagnosis
 
@@ -51,6 +53,7 @@ export const errors = {
 ```
 
 Why no class:
+
 - These are SDK wrapper errors, not application exceptions
 - The original RevenueCat error (in `cause`) already has stack traces
 - A PlutusError stack trace just points to plutus internals — useless to the consumer

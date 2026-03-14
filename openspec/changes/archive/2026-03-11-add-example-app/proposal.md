@@ -13,6 +13,7 @@ Plutus is a reusable RevenueCat wrapper library, but there's no runnable example
 ## Capabilities
 
 ### New Capabilities
+
 - `example-app-setup`: Expo app scaffolding, pnpm workspace config, metro/babel/tailwind configuration, and workspace scripts
 - `example-paywall-screen`: Minimal paywall UI demonstrating PlutusProvider integration, offerings display, and purchase flow
 
