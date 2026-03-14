@@ -35,14 +35,14 @@ import { PlutusProvider } from "@byarcadia-app/plutus";
 
 ### Props
 
-| Prop              | Type                                    | Required | Default                                    | Description                                          |
-| ----------------- | --------------------------------------- | -------- | ------------------------------------------ | ---------------------------------------------------- |
-| `apiKey`          | `string`                                | Yes      | —                                          | RevenueCat API key                                   |
-| `entitlementName` | `string`                                | Yes      | —                                          | Entitlement identifier to check for pro/trial status |
-| `logLevel`        | `LOG_LEVEL`                             | No       | `LOG_LEVEL.ERROR`                          | RevenueCat SDK log level                             |
-| `offerings`       | `{ default?: string; rescue?: string }` | No       | `{ default: "default", rescue: "rescue" }` | Offering identifiers for default and rescue paywalls |
-| `callbacks`       | `PlutusCallbacks`                       | No       | —                                          | Event callbacks (see below)                          |
-| `translations`    | `Partial<PlutusTranslations>`           | No       | English defaults                           | Override default translation strings                 |
+| Prop              | Type                                    | Required | Default                                    | Description                                                                                                                  |
+| ----------------- | --------------------------------------- | -------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `apiKey`          | `string`                                | Yes      | —                                          | RevenueCat API key. An empty or whitespace-only value will not initialize the SDK and triggers `onError` with `INIT_FAILED`. |
+| `entitlementName` | `string`                                | Yes      | —                                          | Entitlement identifier to check for pro/trial status                                                                         |
+| `logLevel`        | `LOG_LEVEL`                             | No       | `LOG_LEVEL.ERROR`                          | RevenueCat SDK log level                                                                                                     |
+| `offerings`       | `{ default?: string; rescue?: string }` | No       | `{ default: "default", rescue: "rescue" }` | Offering identifiers for default and rescue paywalls                                                                         |
+| `callbacks`       | `PlutusCallbacks`                       | No       | —                                          | Event callbacks (see below)                                                                                                  |
+| `translations`    | `Partial<PlutusTranslations>`           | No       | English defaults                           | Override default translation strings                                                                                         |
 
 ### Callbacks
 
