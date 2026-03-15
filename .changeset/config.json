@@ -3,7 +3,7 @@
   "changelog": ["@changesets/changelog-github", { "repo": "byarcadia-app/plutus" }],
   "commit": false,
   "fixed": [],
-  "linked": [["@byarcadia-app/aether", "@byarcadia-app/plutus"]],
+  "linked": [],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
