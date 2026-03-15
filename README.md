@@ -30,6 +30,16 @@ Named after the Greek god of wealth — Plutus wraps RevenueCat so you can set u
 - [Errors](docs/errors.md)
 - [Translations](docs/translations.md)
 
+## Agent Skill
+
+Set up Plutus in your project with a single command using [skills.sh](https://skills.sh):
+
+```bash
+npx skills add byarcadia-app/plutus --skill plutus-setup
+```
+
+The skill handles dependency installation, PlutusProvider integration, and environment variable configuration. See [`skills/plutus-setup/`](skills/plutus-setup/) for details.
+
 ## Example App
 
 A complete working integration lives in `example/`. It demonstrates provider setup and all hook usage patterns.
