@@ -1,6 +1,6 @@
 {
   "name": "@byarcadia-app/plutus",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Reusable RevenueCat wrapper for React Native in-app purchases",
   "keywords": [
     "in-app-purchases",

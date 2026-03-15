@@ -1,5 +1,11 @@
 # @byarcadia-app/plutus
 
+## 0.1.1
+
+### Patch Changes
+
+- [`3f4d540`](https://github.com/byarcadia-app/plutus/commit/3f4d540448c4de6a4fec3bb8b98726ec12f4ba23) Thanks [@dominikwozniak](https://github.com/dominikwozniak)! - Fix crash on launch when apiKey is empty — add validation guard before native SDK calls.
+
 ## 0.1.0
 
 ### Minor Changes
