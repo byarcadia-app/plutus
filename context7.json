@@ -1,0 +1,23 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "projectTitle": "@byarcadia-app/plutus",
+  "description": "Callback-driven RevenueCat wrapper for React Native in-app purchases with zero app-specific dependencies",
+  "folders": ["src", "docs"],
+  "excludeFolders": [
+    "dist",
+    "node_modules",
+    "example",
+    ".github",
+    ".changeset",
+    ".sisyphus"
+  ],
+  "excludeFiles": ["pnpm-lock.yaml"],
+  "rules": [
+    "All app-specific concerns (alerts, navigation, analytics) are handled via callbacks — never baked into the library",
+    "Use onTrackEvent fallback pattern: hook-level callback ?? provider-level callback",
+    "Return PlutusError in error callbacks, not translated strings",
+    "New hooks: create src/hooks/use-{name}.ts, consume usePlutus(), export from src/index.ts",
+    "Every public API must have JSDoc with @example tag",
+    "Wrap app root with PlutusProvider for configuration and shared callbacks"
+  ]
+}
