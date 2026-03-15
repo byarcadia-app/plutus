@@ -30,15 +30,12 @@ Named after the Greek god of wealth — Plutus wraps RevenueCat so you can set u
 - [Errors](docs/errors.md)
 - [Translations](docs/translations.md)
 
-## Agent Skill
+## AI Tools
 
-Set up Plutus in your project with a single command using [skills.sh](https://skills.sh):
+This library ships with built-in AI agent support:
 
-```bash
-npx skills add byarcadia-app/plutus --skill plutus-setup
-```
-
-The skill handles dependency installation, PlutusProvider integration, and environment variable configuration. See [`skills/plutus-setup/`](skills/plutus-setup/) for details.
+- **[Claude Code Skills](https://skills.sh)** — `plutus-setup` handles dependency installation, PlutusProvider integration, and environment variable configuration. Install via `npx skills add byarcadia-app/plutus --skill plutus-setup`. See [`skills/plutus-setup/`](skills/plutus-setup/) for details.
+- **[Context7](https://context7.com)** — AI agents can query up-to-date docs and usage patterns via `context7.json`. Use `use context7` in your prompt to activate.
 
 ## Example App
 
