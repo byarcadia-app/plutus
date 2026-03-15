@@ -23,11 +23,21 @@ Step-by-step guide for configuring iOS in-app purchases with RevenueCat and App 
 
 Create a RevenueCat account at the [RevenueCat Overview](https://www.revenuecat.com/docs/welcome/overview). Navigate to the dashboard and create a new project. Select React Native as your platform.
 
+<details>
+<summary>Screenshot: RevenueCat create project form</summary>
+
 ![RevenueCat create project form](./assets/payment-setup/01-revenuecat-create-project.png)
+
+</details>
 
 Follow the initial configuration wizard. RevenueCat suggests a default setup with a "Pro" entitlement and Monthly/Yearly packages — accept these defaults as Plutus is optimized for this model.
 
+<details>
+<summary>Screenshot: RevenueCat initial configuration wizard</summary>
+
 ![RevenueCat initial configuration wizard](./assets/payment-setup/02-revenuecat-initial-config.png)
+
+</details>
 
 After completing the wizard, you receive a **test API key** (`test_XXXXXXX`). Save this key for development and sandbox testing without a real App Store connection.
 
@@ -39,13 +49,23 @@ You must have a real application in App Store Connect with a matching bundle ID.
 
 After a successful build and submission, the app appears in App Store Connect. The RevenueCat dashboard will prompt you to configure your app for the App Store.
 
+<details>
+<summary>Screenshot: RevenueCat dashboard with app creation prompt</summary>
+
 ![RevenueCat dashboard showing app creation prompt](./assets/payment-setup/03-revenuecat-dashboard-sandbox.png)
+
+</details>
 
 ## 3. Connect RevenueCat to App Store Connect
 
 Navigate to the RevenueCat dashboard → Apps & Providers → New App Store app. Enter your app name and the exact bundle ID from your `app.json`.
 
+<details>
+<summary>Screenshot: RevenueCat new App Store app form</summary>
+
 ![RevenueCat new App Store app form with bundle ID field](./assets/payment-setup/04-revenuecat-new-app-store-app.png)
+
+</details>
 
 Configure the following critical sections:
 
@@ -54,7 +74,12 @@ Configure the following critical sections:
 
 > **Note:** If you have existing apps on the same Apple Developer account and RevenueCat account, you can reuse existing In-app Purchase Keys and App Store Connect API keys.
 
+<details>
+<summary>Screenshot: RevenueCat app configuration (IAP key + ASC API)</summary>
+
 ![RevenueCat app configuration with IAP key and ASC API sections](./assets/payment-setup/05-revenuecat-app-config-keys.png)
+
+</details>
 
 Refer to the [RevenueCat Quickstart](https://www.revenuecat.com/docs/getting-started/quickstart) for guided steps on generating these keys in App Store Connect.
 
@@ -62,7 +87,12 @@ Refer to the [RevenueCat Quickstart](https://www.revenuecat.com/docs/getting-sta
 
 In RevenueCat app settings, find the Apple App Store Server Notifications section. Click the **"Apply in App Store Connect"** button for a one-click setup. This automatically configures both Production and Sandbox webhook URLs in App Store Connect under App Information.
 
+<details>
+<summary>Screenshot: App Store Connect server notification URLs</summary>
+
 ![App Store Connect showing RevenueCat server notification URLs configured](./assets/payment-setup/06-asc-server-notifications.png)
+
+</details>
 
 See [Apple Server Notifications](https://www.revenuecat.com/docs/platform-resources/server-notifications/apple-server-notifications) for manual configuration steps if needed.
 
@@ -115,11 +145,21 @@ Add products to your "Pro" group following the `<appname>_<price>_pro` conventio
 
 Reference Name is for your internal identification (e.g., "Monthly Premium").
 
+<details>
+<summary>Screenshot: App Store Connect subscription detail</summary>
+
 ![App Store Connect subscription detail showing product ID and duration](./assets/payment-setup/07-asc-subscription-detail.png)
+
+</details>
 
 > **Note:** The first subscription submission must accompany a new app version. The "Missing Metadata" status is expected for new products and clears after completing the localization metadata section.
 
+<details>
+<summary>Screenshot: App Store Connect subscription group levels</summary>
+
 ![App Store Connect subscription group showing all three subscription levels](./assets/payment-setup/08-asc-subscription-group-overview.png)
+
+</details>
 
 See [iOS Products](https://www.revenuecat.com/docs/getting-started/entitlements/ios-products) for details.
 
@@ -129,17 +169,32 @@ For each product, scroll to Subscription Prices and set the price in USD. Set Av
 
 > **Tip:** Prices auto-convert to other currencies, which can result in inflated regional prices. Review and adjust regional prices before launch to match local market conditions.
 
+<details>
+<summary>Screenshot: App Store Connect pricing and availability</summary>
+
 ![App Store Connect pricing and availability configuration for a subscription](./assets/payment-setup/09-asc-pricing-availability.png)
+
+</details>
 
 ### Add an Introductory Offer (Free Trial)
 
 Open the annual subscription, go to Subscription Prices, click **+**, and select **Create Introductory Offer**.
 
+<details>
+<summary>Screenshot: App Store Connect introductory offer menu</summary>
+
 ![App Store Connect introductory offer menu options](./assets/payment-setup/10-asc-create-introductory-offer.png)
+
+</details>
 
 Set the type to **Free** and duration to **1 Week** to offer a free trial to new subscribers.
 
+<details>
+<summary>Screenshot: App Store Connect free trial configuration</summary>
+
 ![App Store Connect free trial configuration showing Free type and 1 week duration](./assets/payment-setup/11-asc-free-trial-config.png)
+
+</details>
 
 ## 7. Configure the RevenueCat Product Catalog
 
@@ -147,7 +202,12 @@ Set the type to **Free** and duration to **1 Week** to offer a free trial to new
 
 Navigate to RevenueCat dashboard → Product Catalog → Products → New Product → App Store → **Import Products**. Select all products created in App Store Connect and import them.
 
+<details>
+<summary>Screenshot: RevenueCat imported products</summary>
+
 ![RevenueCat product catalog showing three imported products](./assets/payment-setup/12-revenuecat-imported-products.png)
+
+</details>
 
 Refer to the [Products Overview](https://www.revenuecat.com/docs/offerings/products-overview) for more details.
 
@@ -159,7 +219,12 @@ Go to Product Catalog → Entitlements → New Entitlement. Use the identifier *
 
 Attach all imported products to this entitlement.
 
+<details>
+<summary>Screenshot: RevenueCat entitlement with attached products</summary>
+
 ![RevenueCat entitlement configuration with products attached](./assets/payment-setup/13-revenuecat-entitlement-products.png)
+
+</details>
 
 See [Entitlements](https://www.revenuecat.com/docs/getting-started/entitlements) for more information.
 
@@ -171,12 +236,22 @@ Navigate to Product Catalog → Offerings → default → Edit.
 - Assign the Monthly product to the Monthly package (`$rc_monthly`).
 - Assign the Annual product to the Annual package (`$rc_annual`).
 
+<details>
+<summary>Screenshot: RevenueCat default offering packages</summary>
+
 ![RevenueCat default offering with monthly and annual packages configured](./assets/payment-setup/14-revenuecat-default-offering.png)
+
+</details>
 
 **Rescue offering (identifier: `rescue`):**
 Create a new offering with the identifier `rescue`. Add a package and assign the Rescue Annual product. This offering is used by Plutus to present a discount when a user declines the primary offer.
 
+<details>
+<summary>Screenshot: RevenueCat rescue offering package</summary>
+
 ![RevenueCat rescue offering with rescue annual package configured](./assets/payment-setup/15-revenuecat-rescue-offering.png)
+
+</details>
 
 > **Note:** Offering identifiers can be overridden in PlutusProvider via the `offerings` prop. See [PlutusProvider](./provider.md) for details.
 
