@@ -3,14 +3,7 @@
   "projectTitle": "@byarcadia-app/plutus",
   "description": "Callback-driven RevenueCat wrapper for React Native in-app purchases with zero app-specific dependencies",
   "folders": ["src", "docs"],
-  "excludeFolders": [
-    "dist",
-    "node_modules",
-    "example",
-    ".github",
-    ".changeset",
-    ".sisyphus"
-  ],
+  "excludeFolders": ["dist", "node_modules", "example", ".github", ".changeset", ".sisyphus"],
   "excludeFiles": ["pnpm-lock.yaml"],
   "rules": [
     "All app-specific concerns (alerts, navigation, analytics) are handled via callbacks — never baked into the library",

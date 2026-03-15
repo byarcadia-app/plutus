@@ -7,11 +7,13 @@ The context7 schema (`https://context7.com/schema/context7.json`) defines a stan
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Add `context7.json` to plutus root following the same structure as aether
 - Populate with plutus-specific folders, exclusions, and development rules derived from CLAUDE.md
 - Maintain consistency with the aether pattern for cross-package tooling
 
 **Non-Goals:**
+
 - Modifying any source code or build configuration
 - Adding context7 validation to CI
 - Auto-generating context7.json from CLAUDE.md (manual curation is preferred)

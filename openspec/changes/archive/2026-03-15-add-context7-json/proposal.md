@@ -11,9 +11,11 @@ Context7 provides structured project metadata that AI tools and documentation sy
 ## Capabilities
 
 ### New Capabilities
+
 - `context7-config`: Root-level `context7.json` file providing machine-readable project metadata — folders, exclusions, and development rules specific to plutus
 
 ### Modified Capabilities
+
 <!-- None — this is a new standalone file with no impact on existing specs -->
 
 ## Impact
