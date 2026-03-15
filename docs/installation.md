@@ -14,7 +14,7 @@ pnpm add @byarcadia-app/plutus
 pnpm add react-native-purchases   # v9+ required
 ```
 
-Follow [RevenueCat's setup guide](https://docs.revenuecat.com/docs/getting-started) for native configuration (App Store Connect, Play Console, API keys).
+Follow the [Payment Setup guide](./payment-setup.md) for full iOS configuration with RevenueCat and App Store Connect. See also [RevenueCat's quickstart](https://www.revenuecat.com/docs/getting-started/quickstart) for general reference.
 
 > **Tip:** For development and testing, you can use a RevenueCat [Test Store](https://www.revenuecat.com/docs/test-store) API key (prefixed with `test_`). This lets you test purchases without App Store Connect sandbox setup — just configure the Test Store in your RevenueCat dashboard.
 

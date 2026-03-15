@@ -24,6 +24,7 @@ Named after the Greek god of wealth — Plutus wraps RevenueCat so you can set u
 ## Documentation
 
 - [Installation & Quick Start](docs/installation.md)
+- [Payment Setup (iOS)](docs/payment-setup.md)
 - [PlutusProvider](docs/provider.md)
 - [Hooks](docs/hooks.md)
 - [Errors](docs/errors.md)

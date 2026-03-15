@@ -5,6 +5,7 @@ Documentation for the @byarcadia-app/plutus RevenueCat wrapper. Cross-cutting to
 ## Guides
 
 - [Installation & Quick Start](./installation.md) — Install, peer deps, provider setup
+- [Payment Setup (iOS)](./payment-setup.md) — RevenueCat + App Store Connect configuration
 - [PlutusProvider](./provider.md) — Root provider configuration and callbacks
 
 ## API Reference
