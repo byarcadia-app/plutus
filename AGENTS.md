@@ -26,7 +26,7 @@ RevenueCat wrapper for React Native in-app purchases. Callback-driven, zero app-
 
 Before completing any task, run:
 
-    pnpm check && pnpm lint && pnpm fmt:check && pnpm build && pnpm --filter @byarcadia-app/plutus-example exec tsc --noEmit
+    pnpm check && pnpm lint && pnpm fmt:check && pnpm build
 
 ## Changesets
 

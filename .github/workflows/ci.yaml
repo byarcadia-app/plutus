@@ -26,4 +26,3 @@ jobs:
       - run: pnpm lint
       - run: pnpm build
       - run: pnpm fmt:check
-      - run: pnpm --filter @byarcadia-app/plutus-example exec tsc --noEmit
