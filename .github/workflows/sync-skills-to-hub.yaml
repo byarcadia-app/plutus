@@ -1,0 +1,17 @@
+name: Sync skills to hub
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "skills/**"
+  workflow_dispatch:
+
+jobs:
+  plutus-setup:
+    uses: byarcadia-app/gh-actions/.github/workflows/sync-skill-to-hub.yaml@main
+    with:
+      skill-name: plutus-setup
+      skill-path: skills/plutus-setup
+    secrets:
+      target-repo-token: ${{ secrets.HUB_WRITE_TOKEN }}
