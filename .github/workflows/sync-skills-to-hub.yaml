@@ -38,6 +38,13 @@ jobs:
           rm -rf "$DEST_DIR"
           cp -r "$SOURCE_DIR" "$DEST_DIR"
 
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+
+      - name: Format synced files
+        working-directory: hub
+        run: deno fmt
+
       - name: Check for changes
         id: diff
         working-directory: hub
