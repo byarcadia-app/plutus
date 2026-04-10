@@ -6,6 +6,11 @@ on:
     paths:
       - "skills/**"
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Show changes without creating PR"
+        type: boolean
+        default: false
 
 jobs:
   plutus-setup:
@@ -14,5 +19,6 @@ jobs:
       skill-name: plutus-setup
       skill-path: skills/plutus-setup
       pr-labels: "automated,sync"
+      dry-run: ${{ inputs.dry_run || false }}
     secrets:
       target-repo-token: ${{ secrets.HUB_WRITE_TOKEN }}
