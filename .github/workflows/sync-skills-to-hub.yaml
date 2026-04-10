@@ -13,5 +13,6 @@ jobs:
     with:
       skill-name: plutus-setup
       skill-path: skills/plutus-setup
+      pr-labels: "automated,sync"
     secrets:
       target-repo-token: ${{ secrets.HUB_WRITE_TOKEN }}
