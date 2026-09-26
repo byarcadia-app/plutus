@@ -2,50 +2,56 @@
 
 ### Requirement: PlutusProvider initializes RevenueCat SDK
 
-The `PlutusProvider` component SHALL configure and initialize the RevenueCat SDK using the provided `apiKey`. It SHALL accept a `PlutusConfig` object with required fields `apiKey` (string or `{ apple?: string; google?: string }`) and `entitlementName` (string), and optional fields: `logLevel` (LOG_LEVEL, defaults to `ERROR`), `offerings` config, `callbacks`, and `translations`.
+The `PlutusProvider` component SHALL configure and initialize the RevenueCat SDK using the provided `apiKey`. It SHALL accept a `PlutusConfig` object with required fields `apiKey` (string) and `entitlementName` (string), and optional fields: `logLevel` (LOG_LEVEL, defaults to `ERROR`), `offerings` config, `callbacks`, and `translations`. It SHALL configure the SDK once per `apiKey` and `logLevel`; a new `callbacks` object or `entitlementName` SHALL NOT configure it again, and the latest callbacks SHALL be the ones called.
 
-#### Scenario: Successful initialization on iOS
+#### Scenario: Successful initialization
 
 - **WHEN** `PlutusProvider` mounts with a valid `apiKey`
-- **THEN** RevenueCat SDK SHALL be configured with that API key, `Purchases.setLogLevel()` SHALL be called with the configured log level, and `isReady` SHALL become `true`
+- **THEN** `Purchases.setLogLevel()` SHALL be called with the configured log level, RevenueCat SHALL be configured with that API key, and `isReady` SHALL become `true`
 
 #### Scenario: Initialization error
 
-- **WHEN** RevenueCat SDK configuration throws an error
-- **THEN** the `callbacks.onError` callback SHALL be called with a structured error object containing `code: "INIT_FAILED"` and `originalError`, and `isReady` SHALL remain `false`
+- **WHEN** the `apiKey` is empty, or RevenueCat SDK configuration throws
+- **THEN** `callbacks.onError` SHALL be called with an error of `code: "INIT_FAILED"` carrying the thrown value as `cause`, `initError` SHALL hold that error, and `isReady` SHALL remain `false`
 
-### Requirement: Provider accepts platform-specific configuration
+#### Scenario: Callbacks passed inline
 
-The `PlutusConfig` SHALL accept `apiKey` as either a string or an object `{ apple?: string; google?: string }` to support multi-platform apps. The provider SHALL select the correct key based on `Platform.OS`.
-
-#### Scenario: String API key on iOS
-
-- **WHEN** `apiKey` is a string and platform is iOS
-- **THEN** RevenueCat SHALL be configured with that string
-
-#### Scenario: Platform-specific API keys
-
-- **WHEN** `apiKey` is `{ apple: "key_a", google: "key_g" }` and platform is Android
-- **THEN** RevenueCat SHALL be configured with `"key_g"`
+- **WHEN** the provider re-renders with a new `callbacks` object
+- **THEN** RevenueCat SHALL NOT be configured again, and later events SHALL reach the new callbacks
 
 ### Requirement: PlutusProvider manages customer info updates
 
-The provider SHALL register a `customerInfoUpdateListener` on mount and remove it on unmount. When customer info updates, the provider SHALL evaluate the configured `entitlementName` against active entitlements and update `isPro` and `isInTrial` state accordingly.
+The provider SHALL register a `customerInfoUpdateListener` on mount and remove it on unmount, and SHALL request `Purchases.getCustomerInfo()` right after configuring. For every customer info it receives it SHALL evaluate the configured `entitlementName` against active entitlements and update `isPro`, `isInTrial`, `expirationDate` and `managementURL`, and set `isCustomerInfoLoaded` to `true`.
+
+#### Scenario: Customer info known at start
+
+- **WHEN** `getCustomerInfo()` resolves with the configured entitlement active, before any listener update
+- **THEN** `isPro` SHALL be `true` and `isCustomerInfoLoaded` SHALL be `true`
+
+#### Scenario: Stale initial customer info
+
+- **WHEN** a listener update arrives before `getCustomerInfo()` resolves
+- **THEN** the `getCustomerInfo()` result SHALL be ignored
+
+#### Scenario: Initial customer info fails
+
+- **WHEN** `getCustomerInfo()` rejects
+- **THEN** `callbacks.onError` SHALL be called with `code: "CUSTOMER_INFO_FAILED"` and `isCustomerInfoLoaded` SHALL stay `false` until a listener update arrives
 
 #### Scenario: Customer gains entitlement
 
 - **WHEN** a customer info update arrives with the configured entitlement active
-- **THEN** `isPro` SHALL be `true`
+- **THEN** `isPro` SHALL be `true` and `expirationDate` SHALL be the entitlement's `expirationDate`
 
 #### Scenario: Customer has trial entitlement
 
 - **WHEN** a customer info update arrives with the configured entitlement active and `periodType` is `"TRIAL"`
-- **THEN** `isPro` SHALL be `true` and `isInTrial` SHALL be `true`
+- **THEN** `isPro` SHALL be `true`, `isInTrial` SHALL be `true`, and `expirationDate` SHALL be the trial's end
 
 #### Scenario: Customer info callback
 
 - **WHEN** customer info updates
-- **THEN** the `callbacks.onCustomerInfoUpdated` callback SHALL be called with the `CustomerInfo` object and the derived entitlement state (`isPro`, `isInTrial`)
+- **THEN** the `callbacks.onCustomerInfoUpdated` callback SHALL be called with the `CustomerInfo` object and the derived state (`isPro`, `isInTrial`, `expirationDate`)
 
 ### Requirement: Provider configures offering identifiers
 
@@ -91,7 +97,7 @@ The `PlutusConfig.callbacks` SHALL accept an optional `onTrackEvent(name: string
 
 ### Requirement: usePlutus hook provides context access
 
-The `usePlutus` hook SHALL return the provider's state and actions: `isPro`, `isInTrial`, `isReady`, `managementURL`, `purchasePackage`, `restorePurchases`, and `translations`. It SHALL throw an error if used outside of `PlutusProvider`.
+The `usePlutus` hook SHALL return the provider's state and actions: `isPro`, `isInTrial`, `isReady`, `isCustomerInfoLoaded`, `expirationDate`, `initError`, `managementURL`, `purchasePackage`, `restorePurchases`, and `translations`. It SHALL throw an error if used outside of `PlutusProvider`.
 
 #### Scenario: Hook used within provider
 

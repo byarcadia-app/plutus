@@ -2,7 +2,7 @@
 
 ### Requirement: purchasePackage executes a purchase and returns result
 
-The `purchasePackage` function exposed by `usePlutus` SHALL accept a `PurchasesPackage` and attempt to purchase it via RevenueCat SDK. It SHALL return `true` if the purchase resulted in the configured entitlement becoming active, and `false`/`undefined` otherwise.
+The `purchasePackage` function exposed by `usePlutus` SHALL accept a `PurchasesPackage` and attempt to purchase it via RevenueCat SDK. It SHALL return `true` if the purchase resulted in the configured entitlement becoming active, `false` if it did not or if the store failed, and `undefined` only when the person cancelled.
 
 #### Scenario: Successful purchase
 
@@ -17,7 +17,7 @@ The `purchasePackage` function exposed by `usePlutus` SHALL accept a `PurchasesP
 #### Scenario: Purchase error
 
 - **WHEN** a non-cancellation purchase error occurs
-- **THEN** the `callbacks.onError` callback SHALL be called with a structured error object containing `code: "PURCHASE_FAILED"`, `originalError` (the `PurchasesError`), and `package` (the attempted `PurchasesPackage`), and the function SHALL return `undefined`
+- **THEN** the `callbacks.onError` callback SHALL be called with an error of `code: "PURCHASE_FAILED"` carrying the `PurchasesError` as `cause` and the attempted `PurchasesPackage` as `package`, and the function SHALL return `false`
 
 ### Requirement: restorePurchases restores previous purchases
 
