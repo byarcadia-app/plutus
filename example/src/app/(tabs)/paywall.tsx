@@ -8,6 +8,8 @@ export default function PaywallScreen() {
 
   const {
     isLoading,
+    error,
+    refetch,
     monthlyOffer,
     annualOffer,
     annualDiscountPercentage,
@@ -56,6 +58,20 @@ export default function PaywallScreen() {
       <View className="flex-1 bg-background items-center justify-center">
         <ActivityIndicator size="large" />
         <Text className="text-sm font-inter text-muted-foreground mt-4">Loading offerings...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View className="flex-1 bg-background items-center justify-center p-6">
+        <Text className="text-base font-interSemiBold text-foreground mb-2">
+          Offerings did not load
+        </Text>
+        <Text className="text-sm font-inter text-muted-foreground mb-6">{error.code}</Text>
+        <Pressable className="bg-primary rounded-xl py-3 px-6 active:opacity-80" onPress={refetch}>
+          <Text className="text-base font-interSemiBold text-primary-foreground">Try again</Text>
+        </Pressable>
       </View>
     );
   }
