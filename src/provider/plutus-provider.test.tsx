@@ -2,6 +2,7 @@ import { act, render, waitFor } from "@testing-library/react";
 import Purchases, { LOG_LEVEL, PURCHASES_ERROR_CODE } from "react-native-purchases";
 import { describe, expect, it, vi } from "vitest";
 
+import { deferred } from "../../test/deferred";
 import { emitCustomerInfo, listenerCount } from "../../test/fake-purchases";
 import {
   annualPackage,
@@ -111,18 +112,57 @@ describe("PlutusProvider", () => {
     expect(result.current.isPro).toBe(false);
   });
 
-  it("0.1.1 behaviour — changes in 0.2.0: a new callbacks object configures RevenueCat again", async () => {
-    const tree = () => (
-      <PlutusProvider apiKey="test_key" entitlementName="Pro" callbacks={{ onError: () => {} }}>
+  it("configures RevenueCat once when callbacks arrive inline, and calls the latest ones", async () => {
+    const first = vi.fn();
+    const second = vi.fn();
+    const tree = (onCustomerInfoUpdated: () => void) => (
+      <PlutusProvider apiKey="test_key" entitlementName="Pro" callbacks={{ onCustomerInfoUpdated }}>
         {null}
       </PlutusProvider>
     );
-    const { rerender } = render(tree());
-    await waitFor(() => expect(Purchases.configure).toHaveBeenCalledTimes(1));
+    const { rerender } = render(tree(first));
+    await waitFor(() => expect(listenerCount()).toBe(1));
 
-    rerender(tree());
+    rerender(tree(second));
+    await act(async () => {});
+    act(() => emitCustomerInfo(customerInfo()));
 
-    await waitFor(() => expect(Purchases.configure).toHaveBeenCalledTimes(2));
+    expect(Purchases.configure).toHaveBeenCalledOnce();
+    expect(first).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalledOnce();
+  });
+
+  it("honours a new entitlement name without configuring again", async () => {
+    let isPro = false;
+    function Probe() {
+      isPro = usePlutus().isPro;
+      return null;
+    }
+    const tree = (entitlementName: string) => (
+      <PlutusProvider apiKey="test_key" entitlementName={entitlementName}>
+        <Probe />
+      </PlutusProvider>
+    );
+    const { rerender } = render(tree("Pro"));
+    await waitFor(() => expect(listenerCount()).toBe(1));
+
+    rerender(tree("Legacy"));
+    act(() => emitCustomerInfo(customerInfo([entitlement({ identifier: "Legacy" })])));
+
+    expect(isPro).toBe(true);
+    expect(Purchases.configure).toHaveBeenCalledOnce();
+  });
+
+  it("leaves RevenueCat alone when unmounted before the start finished", async () => {
+    const logLevelSet = deferred<void>();
+    vi.mocked(Purchases.setLogLevel).mockReturnValue(logLevelSet.promise);
+    const { unmount } = renderInPlutus(() => usePlutus());
+
+    unmount();
+    await act(async () => logLevelSet.resolve());
+
+    expect(Purchases.configure).not.toHaveBeenCalled();
+    expect(listenerCount()).toBe(0);
   });
 
   describe("purchasePackage", () => {
