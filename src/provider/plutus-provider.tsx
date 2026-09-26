@@ -23,6 +23,9 @@ export interface PlutusContextValue {
   isPro: boolean;
   isInTrial: boolean;
   isReady: boolean;
+  isCustomerInfoLoaded: boolean;
+  expirationDate: string | null;
+  initError: PlutusError | null;
   managementURL: string | null;
   purchasePackage: (pack: PurchasesPackage) => Promise<boolean | undefined>;
   restorePurchases: () => Promise<boolean>;
@@ -50,7 +53,13 @@ export const PlutusProvider = ({
   const [isReady, setIsReady] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const [isInTrial, setIsInTrial] = useState(false);
+  const [isCustomerInfoLoaded, setIsCustomerInfoLoaded] = useState(false);
+  const [expirationDate, setExpirationDate] = useState<string | null>(null);
+  const [initError, setInitError] = useState<PlutusError | null>(null);
   const [managementURL, setManagementURL] = useState<string | null>(null);
+
+  // Bumped on every customer info applied, so the start-up read can tell it was overtaken.
+  const customerInfoVersion = useRef(0);
 
   // The SDK listener and the actions read these through a ref, so a new callbacks object or
   // entitlement name never re-configures RevenueCat.
@@ -97,14 +106,19 @@ export const PlutusProvider = ({
 
     const newIsPro = entitlement !== undefined;
     const newIsInTrial = entitlement?.periodType === "TRIAL";
+    const newExpirationDate = entitlement?.expirationDate ?? null;
 
+    customerInfoVersion.current += 1;
     setIsPro(newIsPro);
     setIsInTrial(newIsInTrial);
+    setExpirationDate(newExpirationDate);
+    setIsCustomerInfoLoaded(true);
     setManagementURL(customerInfo.managementURL);
 
     latest.current.callbacks?.onCustomerInfoUpdated?.(customerInfo, {
       isPro: newIsPro,
       isInTrial: newIsInTrial,
+      expirationDate: newExpirationDate,
     });
   }, []);
 
@@ -115,9 +129,14 @@ export const PlutusProvider = ({
       updateCustomerInformation(info);
     };
 
+    const failInit = (error: PlutusError) => {
+      setInitError(error);
+      onError(error);
+    };
+
     const init = async () => {
       if (!apiKey || !apiKey.trim()) {
-        onError(
+        failInit(
           errors.INIT_FAILED(new Error("Plutus: apiKey must not be empty. SDK not initialized.")),
         );
         return;
@@ -135,9 +154,25 @@ export const PlutusProvider = ({
 
         Purchases.addCustomerInfoUpdateListener(customerInfoUpdateListener);
 
+        setInitError(null);
         setIsReady(true);
       } catch (error) {
-        onError(errors.INIT_FAILED(error));
+        failInit(errors.INIT_FAILED(error));
+        return;
+      }
+
+      const version = customerInfoVersion.current;
+
+      try {
+        const customerInfo = await Purchases.getCustomerInfo();
+
+        if (isActive && customerInfoVersion.current === version) {
+          updateCustomerInformation(customerInfo);
+        }
+      } catch (error) {
+        if (isActive) {
+          onError(errors.CUSTOMER_INFO_FAILED(error));
+        }
       }
     };
 
@@ -191,6 +226,9 @@ export const PlutusProvider = ({
       isPro,
       isInTrial,
       isReady,
+      isCustomerInfoLoaded,
+      expirationDate,
+      initError,
       managementURL,
       purchasePackage,
       restorePurchases,
@@ -203,6 +241,9 @@ export const PlutusProvider = ({
       isPro,
       isInTrial,
       isReady,
+      isCustomerInfoLoaded,
+      expirationDate,
+      initError,
       managementURL,
       purchasePackage,
       restorePurchases,

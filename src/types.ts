@@ -15,7 +15,7 @@ export interface PlutusConfig {
     onError?: (error: PlutusError) => void;
     onCustomerInfoUpdated?: (
       customerInfo: CustomerInfo,
-      state: { isPro: boolean; isInTrial: boolean },
+      state: { isPro: boolean; isInTrial: boolean; expirationDate: string | null },
     ) => void;
     onTrackEvent?: (name: string, params?: Record<string, unknown>) => void;
   };

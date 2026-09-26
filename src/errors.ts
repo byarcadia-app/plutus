@@ -2,6 +2,7 @@ import type { PurchasesPackage } from "react-native-purchases";
 
 export type PlutusErrorCode =
   | "INIT_FAILED"
+  | "CUSTOMER_INFO_FAILED"
   | "PURCHASE_FAILED"
   | "OFFERINGS_FAILED"
   | "RESTORE_FAILED";
@@ -17,6 +18,11 @@ export const errors = {
   INIT_FAILED: (cause: unknown): PlutusError => ({
     code: "INIT_FAILED",
     message: "Initialization failed",
+    cause,
+  }),
+  CUSTOMER_INFO_FAILED: (cause: unknown): PlutusError => ({
+    code: "CUSTOMER_INFO_FAILED",
+    message: "Failed to load customer info",
     cause,
   }),
   PURCHASE_FAILED: (cause: unknown, pack?: PurchasesPackage): PlutusError => ({
