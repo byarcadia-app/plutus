@@ -15,6 +15,12 @@ export interface PlutusError {
   readonly package?: PurchasesPackage;
 }
 
+/**
+ * Builds the structured errors Plutus hands to `callbacks.onError`.
+ *
+ * @example
+ * onError(errors.PURCHASE_FAILED(cause, pack));
+ */
 export const errors = {
   INIT_FAILED: (cause: unknown): PlutusError => ({
     code: "INIT_FAILED",

@@ -15,6 +15,17 @@ interface UseRescuePaywallOptions {
   privacyUrl?: string;
 }
 
+/**
+ * Drives the rescue paywall for a single discounted package. A cancelled purchase is tracked as
+ * `paywall_purchase_cancelled` and calls no failure callback.
+ *
+ * @example
+ * const { rescueOffer } = useOfferings();
+ * const { handlePurchasePackage, handleClosePress } = useRescuePaywall({
+ *   rescueOffer,
+ *   onPurchaseSuccess: () => router.back(),
+ * });
+ */
 export const useRescuePaywall = ({
   rescueOffer,
   onClose,

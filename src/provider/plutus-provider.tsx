@@ -27,11 +27,16 @@ const isCancellation = (error: unknown) =>
 export interface PlutusContextValue {
   isPro: boolean;
   isInTrial: boolean;
+  /** The SDK is configured. Says nothing yet about the person's entitlement. */
   isReady: boolean;
+  /** Customer info has arrived, so `isPro` and `isInTrial` are known. */
   isCustomerInfoLoaded: boolean;
+  /** When the entitlement ends, in ISO 8601 — the trial's end while in a trial. */
   expirationDate: string | null;
+  /** The `INIT_FAILED` error when the SDK could not start; `isReady` then stays false. */
   initError: PlutusError | null;
   managementURL: string | null;
+  /** `true` on success, `false` on a failure, `undefined` when the person cancelled. */
   purchasePackage: (pack: PurchasesPackage) => Promise<boolean | undefined>;
   restorePurchases: () => Promise<boolean>;
   translations: typeof defaultTranslations;
@@ -46,6 +51,19 @@ interface PlutusProviderProps extends PlutusConfig {
   children: React.ReactNode;
 }
 
+/**
+ * Configures RevenueCat once per `apiKey` and `logLevel`, reads the person's customer info, and
+ * shares entitlement state with every Plutus hook below it.
+ *
+ * @example
+ * <PlutusProvider
+ *   apiKey={process.env.EXPO_PUBLIC_REVENUECAT_KEY ?? ""}
+ *   entitlementName="Pro"
+ *   callbacks={{ onError: (error) => report(error.code, error.cause) }}
+ * >
+ *   <App />
+ * </PlutusProvider>
+ */
 export const PlutusProvider = ({
   children,
   apiKey,

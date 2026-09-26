@@ -95,6 +95,15 @@ interface Offers {
 
 const NO_OFFERS: Offers = { monthlyHasTrial: false, annualHasTrial: false };
 
+/**
+ * The default and rescue offerings, whether this person can still get each free trial, and the
+ * savings between plans. Loading from the first render until everything has arrived.
+ *
+ * @example
+ * const { isLoading, error, refetch, annualOffer, annualHasTrial } = useOfferings();
+ * if (isLoading) return <Spinner />;
+ * if (error) return <Retry onPress={refetch} />;
+ */
 export const useOfferings = (options?: UseOfferingsOptions) => {
   const { isReady, initError, offeringsConfig, onError } = usePlutus();
 

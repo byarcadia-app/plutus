@@ -73,7 +73,7 @@ This is the critical step. Read the root layout file, understand the existing pr
 **Recommended props:**
 
 - `callbacks.onError` — at minimum, log errors
-- `callbacks.onTrackEvent` — analytics fallback
+- `callbacks.onTrackEvent` — analytics; every hook reports its events through it
 
 **Example integration** (Expo Router with existing providers):
 

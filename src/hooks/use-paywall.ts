@@ -16,6 +16,17 @@ interface UsePaywallOptions {
   privacyUrl?: string;
 }
 
+/**
+ * Drives the main paywall: the chosen plan, purchase, restore, close and legal links. A cancelled
+ * purchase is tracked as `paywall_purchase_cancelled` and calls no failure callback.
+ *
+ * @example
+ * const { subscriptionType, handleSubscriptionTypeChange, handlePurchasePackage } = usePaywall({
+ *   monthlyOffer,
+ *   annualOffer,
+ *   onPurchaseSuccess: () => router.back(),
+ * });
+ */
 export const usePaywall = ({
   monthlyOffer,
   annualOffer,
