@@ -11,13 +11,18 @@ import Purchases, {
   type CustomerInfo,
   LOG_LEVEL,
   PURCHASES_ERROR_CODE,
-  type PurchasesError,
   type PurchasesPackage,
 } from "react-native-purchases";
 
 import { errors, type PlutusError } from "../errors";
 import { defaultTranslations } from "../translations";
 import type { PlutusConfig } from "../types";
+
+const isCancellation = (error: unknown) =>
+  typeof error === "object" &&
+  error !== null &&
+  "code" in error &&
+  error.code === PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR;
 
 export interface PlutusContextValue {
   isPro: boolean;
@@ -194,15 +199,14 @@ export const PlutusProvider = ({
           result.customerInfo.entitlements.active?.[latest.current.entitlementName] !== undefined
         );
       } catch (error: unknown) {
-        const errorCode = (error as PurchasesError)?.code;
-
-        if (errorCode === PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR) {
+        // `undefined` is reserved for a cancel, so callers can tell it from a failure.
+        if (isCancellation(error)) {
           return undefined;
         }
 
         onError(errors.PURCHASE_FAILED(error, pack));
 
-        return undefined;
+        return false;
       }
     },
     [updateCustomerInformation, onError],

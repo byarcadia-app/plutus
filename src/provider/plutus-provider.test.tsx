@@ -267,7 +267,7 @@ describe("PlutusProvider", () => {
       expect(onError).not.toHaveBeenCalled();
     });
 
-    it("0.1.1 behaviour — changes in 0.2.0: resolves undefined when the store fails", async () => {
+    it("resolves false and reports PURCHASE_FAILED when the store fails", async () => {
       const onError = vi.fn();
       const { result } = await renderReady({ callbacks: { onError } });
       const pkg = annualPackage();
@@ -275,12 +275,12 @@ describe("PlutusProvider", () => {
         purchasesError(PURCHASES_ERROR_CODE.STORE_PROBLEM_ERROR),
       );
 
-      let outcome: boolean | undefined = false;
+      let outcome: boolean | undefined;
       await act(async () => {
         outcome = await result.current.purchasePackage(pkg);
       });
 
-      expect(outcome).toBeUndefined();
+      expect(outcome).toBe(false);
       expect(onError).toHaveBeenCalledWith(
         expect.objectContaining({ code: "PURCHASE_FAILED", package: pkg }),
       );

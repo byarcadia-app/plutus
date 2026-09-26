@@ -41,11 +41,27 @@ describe("useRescuePaywall", () => {
     });
   });
 
-  it("0.1.1 behaviour — changes in 0.2.0: a cancelled purchase counts as a failure", async () => {
+  it("tracks a cancelled purchase as a cancel, not a failure", async () => {
     const onPurchaseFailed = vi.fn();
     const { result, onTrackEvent } = renderRescue({ onPurchaseFailed });
     vi.mocked(Purchases.purchasePackage).mockRejectedValue(
       purchasesError(PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR),
+    );
+
+    await act(() => result.current.handlePurchasePackage());
+
+    expect(onPurchaseFailed).not.toHaveBeenCalled();
+    expect(onTrackEvent).toHaveBeenCalledWith("paywall_purchase_cancelled", {
+      is_rescue_offer: true,
+    });
+    expect(onTrackEvent).not.toHaveBeenCalledWith("paywall_purchase_failed");
+  });
+
+  it("calls onPurchaseFailed when the store fails", async () => {
+    const onPurchaseFailed = vi.fn();
+    const { result, onTrackEvent } = renderRescue({ onPurchaseFailed });
+    vi.mocked(Purchases.purchasePackage).mockRejectedValue(
+      purchasesError(PURCHASES_ERROR_CODE.STORE_PROBLEM_ERROR),
     );
 
     await act(() => result.current.handlePurchasePackage());

@@ -64,6 +64,10 @@ export const useRescuePaywall = ({
           is_rescue_offer: true,
         });
         onPurchaseSuccess?.();
+      } else if (purchased === undefined) {
+        onTrackEvent?.("paywall_purchase_cancelled", {
+          is_rescue_offer: true,
+        });
       } else {
         onTrackEvent?.("paywall_purchase_failed");
         onPurchaseFailed?.();

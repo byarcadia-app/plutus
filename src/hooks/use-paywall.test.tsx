@@ -77,7 +77,7 @@ describe("usePaywall", () => {
     expect(onTrackEvent).toHaveBeenCalledWith("paywall_purchase_failed");
   });
 
-  it("0.1.1 behaviour — changes in 0.2.0: a cancelled purchase counts as a failure", async () => {
+  it("tracks a cancelled purchase as a cancel, not a failure", async () => {
     const onPurchaseFailed = vi.fn();
     const { result, onTrackEvent } = renderPaywall({ onPurchaseFailed });
     vi.mocked(Purchases.purchasePackage).mockRejectedValue(
@@ -86,8 +86,13 @@ describe("usePaywall", () => {
 
     await act(() => result.current.handlePurchasePackage());
 
-    expect(onPurchaseFailed).toHaveBeenCalledOnce();
-    expect(onTrackEvent).toHaveBeenCalledWith("paywall_purchase_failed");
+    expect(onPurchaseFailed).not.toHaveBeenCalled();
+    expect(onTrackEvent).toHaveBeenCalledWith("paywall_purchase_cancelled", {
+      type: "annual",
+      is_rescue_offer: false,
+    });
+    expect(onTrackEvent).not.toHaveBeenCalledWith("paywall_purchase_failed");
+    expect(result.current.isPurchasing).toBe(false);
   });
 
   it("buys nothing while an offer is missing", async () => {
