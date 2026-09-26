@@ -28,12 +28,17 @@ interface PlutusError {
 
 ## Error Codes
 
-| Code               | When                                        |
-| ------------------ | ------------------------------------------- |
-| `INIT_FAILED`      | RevenueCat SDK initialization fails         |
-| `PURCHASE_FAILED`  | A package purchase fails (not cancellation) |
-| `OFFERINGS_FAILED` | Loading offerings fails                     |
-| `RESTORE_FAILED`   | Restoring purchases fails                   |
+| Code                       | When                                                          |
+| -------------------------- | ------------------------------------------------------------- |
+| `INIT_FAILED`              | RevenueCat SDK initialization fails, or `apiKey` is empty     |
+| `CUSTOMER_INFO_FAILED`     | Reading customer info right after initialization fails        |
+| `PURCHASE_FAILED`          | A package purchase fails (not cancellation)                   |
+| `OFFERINGS_FAILED`         | Loading offerings fails                                       |
+| `TRIAL_ELIGIBILITY_FAILED` | Checking trial eligibility fails (iOS); the offers still load |
+| `RESTORE_FAILED`           | Restoring purchases fails                                     |
+
+New codes can arrive in a minor release while the package is 0.x — keep a `default` branch rather
+than an exhaustive `switch` guarded by `never`.
 
 ## Factory Functions
 
@@ -45,11 +50,17 @@ import { errors } from "@byarcadia-app/plutus";
 errors.INIT_FAILED(cause);
 // → { code: "INIT_FAILED", message: "Initialization failed", cause }
 
+errors.CUSTOMER_INFO_FAILED(cause);
+// → { code: "CUSTOMER_INFO_FAILED", message: "Failed to load customer info", cause }
+
 errors.PURCHASE_FAILED(cause, pack);
 // → { code: "PURCHASE_FAILED", message: "Purchase failed", cause, package: pack }
 
 errors.OFFERINGS_FAILED(cause);
 // → { code: "OFFERINGS_FAILED", message: "Failed to load offerings", cause }
+
+errors.TRIAL_ELIGIBILITY_FAILED(cause);
+// → { code: "TRIAL_ELIGIBILITY_FAILED", message: "Failed to check trial eligibility", cause }
 
 errors.RESTORE_FAILED(cause);
 // → { code: "RESTORE_FAILED", message: "Restore purchases failed", cause }
@@ -75,6 +86,8 @@ Handle errors via the provider's `onError` callback:
         case "RESTORE_FAILED":
           Alert.alert(translations.restoreError.title, translations.restoreError.message);
           break;
+        default:
+          crashlytics.recordError(error.cause);
       }
     },
   }}

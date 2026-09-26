@@ -1,9 +1,16 @@
-import { createContext, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Purchases, {
   type CustomerInfo,
   LOG_LEVEL,
   PURCHASES_ERROR_CODE,
-  type PurchasesError,
   type PurchasesPackage,
 } from "react-native-purchases";
 
@@ -11,11 +18,25 @@ import { errors, type PlutusError } from "../errors";
 import { defaultTranslations } from "../translations";
 import type { PlutusConfig } from "../types";
 
+const isCancellation = (error: unknown) =>
+  typeof error === "object" &&
+  error !== null &&
+  "code" in error &&
+  error.code === PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR;
+
 export interface PlutusContextValue {
   isPro: boolean;
   isInTrial: boolean;
+  /** The SDK is configured. Says nothing yet about the person's entitlement. */
   isReady: boolean;
+  /** Customer info has arrived, so `isPro` and `isInTrial` are known. */
+  isCustomerInfoLoaded: boolean;
+  /** When the entitlement ends, in ISO 8601 — the trial's end while in a trial. */
+  expirationDate: string | null;
+  /** The `INIT_FAILED` error when the SDK could not start; `isReady` then stays false. */
+  initError: PlutusError | null;
   managementURL: string | null;
+  /** `true` on success, `false` on a failure, `undefined` when the person cancelled. */
   purchasePackage: (pack: PurchasesPackage) => Promise<boolean | undefined>;
   restorePurchases: () => Promise<boolean>;
   translations: typeof defaultTranslations;
@@ -30,6 +51,19 @@ interface PlutusProviderProps extends PlutusConfig {
   children: React.ReactNode;
 }
 
+/**
+ * Configures RevenueCat once per `apiKey` and `logLevel`, reads the person's customer info, and
+ * shares entitlement state with every Plutus hook below it.
+ *
+ * @example
+ * <PlutusProvider
+ *   apiKey={process.env.EXPO_PUBLIC_REVENUECAT_KEY ?? ""}
+ *   entitlementName="Pro"
+ *   callbacks={{ onError: (error) => report(error.code, error.cause) }}
+ * >
+ *   <App />
+ * </PlutusProvider>
+ */
 export const PlutusProvider = ({
   children,
   apiKey,
@@ -42,7 +76,29 @@ export const PlutusProvider = ({
   const [isReady, setIsReady] = useState(false);
   const [isPro, setIsPro] = useState(false);
   const [isInTrial, setIsInTrial] = useState(false);
+  const [isCustomerInfoLoaded, setIsCustomerInfoLoaded] = useState(false);
+  const [expirationDate, setExpirationDate] = useState<string | null>(null);
+  const [initError, setInitError] = useState<PlutusError | null>(null);
   const [managementURL, setManagementURL] = useState<string | null>(null);
+
+  // Bumped on every customer info applied, so the start-up read can tell it was overtaken.
+  const customerInfoVersion = useRef(0);
+
+  // The SDK listener and the actions read these through a ref, so a new callbacks object or
+  // entitlement name never re-configures RevenueCat.
+  const latest = useRef({ entitlementName, callbacks });
+  useLayoutEffect(() => {
+    latest.current = { entitlementName, callbacks };
+  });
+
+  // Forwards the arguments as given: an event without params still arrives with one argument.
+  const onTrackEvent = useCallback((...event: [name: string, params?: Record<string, unknown>]) => {
+    latest.current.callbacks?.onTrackEvent?.(...event);
+  }, []);
+
+  const onError = useCallback((error: PlutusError) => {
+    latest.current.callbacks?.onError?.(error);
+  }, []);
 
   const translations = useMemo(
     () => ({
@@ -68,33 +124,42 @@ export const PlutusProvider = ({
     [offerings?.default, offerings?.rescue],
   );
 
-  const updateCustomerInformation = useCallback(
-    (customerInfo: CustomerInfo) => {
-      const entitlement = customerInfo?.entitlements.active?.[entitlementName];
+  const updateCustomerInformation = useCallback((customerInfo: CustomerInfo) => {
+    const entitlement = customerInfo?.entitlements.active?.[latest.current.entitlementName];
 
-      const newIsPro = entitlement !== undefined;
-      const newIsInTrial = entitlement?.periodType === "TRIAL";
+    const newIsPro = entitlement !== undefined;
+    const newIsInTrial = entitlement?.periodType === "TRIAL";
+    const newExpirationDate = entitlement?.expirationDate ?? null;
 
-      setIsPro(newIsPro);
-      setIsInTrial(newIsInTrial);
-      setManagementURL(customerInfo.managementURL);
+    customerInfoVersion.current += 1;
+    setIsPro(newIsPro);
+    setIsInTrial(newIsInTrial);
+    setExpirationDate(newExpirationDate);
+    setIsCustomerInfoLoaded(true);
+    setManagementURL(customerInfo.managementURL);
 
-      callbacks?.onCustomerInfoUpdated?.(customerInfo, {
-        isPro: newIsPro,
-        isInTrial: newIsInTrial,
-      });
-    },
-    [entitlementName, callbacks],
-  );
+    latest.current.callbacks?.onCustomerInfoUpdated?.(customerInfo, {
+      isPro: newIsPro,
+      isInTrial: newIsInTrial,
+      expirationDate: newExpirationDate,
+    });
+  }, []);
 
   useEffect(() => {
+    let isActive = true;
+
     const customerInfoUpdateListener = (info: CustomerInfo) => {
       updateCustomerInformation(info);
     };
 
+    const failInit = (error: PlutusError) => {
+      setInitError(error);
+      onError(error);
+    };
+
     const init = async () => {
       if (!apiKey || !apiKey.trim()) {
-        callbacks?.onError?.(
+        failInit(
           errors.INIT_FAILED(new Error("Plutus: apiKey must not be empty. SDK not initialized.")),
         );
         return;
@@ -103,22 +168,44 @@ export const PlutusProvider = ({
       try {
         await Purchases.setLogLevel(logLevel ?? LOG_LEVEL.ERROR);
 
+        // Unmounted while the log level was set: a later run owns the SDK.
+        if (!isActive) {
+          return;
+        }
+
         Purchases.configure({ apiKey });
 
         Purchases.addCustomerInfoUpdateListener(customerInfoUpdateListener);
 
+        setInitError(null);
         setIsReady(true);
       } catch (error) {
-        callbacks?.onError?.(errors.INIT_FAILED(error));
+        failInit(errors.INIT_FAILED(error));
+        return;
+      }
+
+      const version = customerInfoVersion.current;
+
+      try {
+        const customerInfo = await Purchases.getCustomerInfo();
+
+        if (isActive && customerInfoVersion.current === version) {
+          updateCustomerInformation(customerInfo);
+        }
+      } catch (error) {
+        if (isActive) {
+          onError(errors.CUSTOMER_INFO_FAILED(error));
+        }
       }
     };
 
     init();
 
     return () => {
+      isActive = false;
       Purchases.removeCustomerInfoUpdateListener(customerInfoUpdateListener);
     };
-  }, [apiKey, logLevel, updateCustomerInformation, callbacks]);
+  }, [apiKey, logLevel, updateCustomerInformation, onError]);
 
   const purchasePackage = useCallback(
     async (pack: PurchasesPackage): Promise<boolean | undefined> => {
@@ -126,20 +213,21 @@ export const PlutusProvider = ({
         const result = await Purchases.purchasePackage(pack);
         updateCustomerInformation(result.customerInfo);
 
-        return result.customerInfo.entitlements.active?.[entitlementName] !== undefined;
+        return (
+          result.customerInfo.entitlements.active?.[latest.current.entitlementName] !== undefined
+        );
       } catch (error: unknown) {
-        const errorCode = (error as PurchasesError)?.code;
-
-        if (errorCode === PURCHASES_ERROR_CODE.PURCHASE_CANCELLED_ERROR) {
+        // `undefined` is reserved for a cancel, so callers can tell it from a failure.
+        if (isCancellation(error)) {
           return undefined;
         }
 
-        callbacks?.onError?.(errors.PURCHASE_FAILED(error, pack));
+        onError(errors.PURCHASE_FAILED(error, pack));
 
-        return undefined;
+        return false;
       }
     },
-    [entitlementName, updateCustomerInformation, callbacks],
+    [updateCustomerInformation, onError],
   );
 
   const restorePurchases = useCallback(async (): Promise<boolean> => {
@@ -147,37 +235,43 @@ export const PlutusProvider = ({
       const customerInfo = await Purchases.restorePurchases();
       updateCustomerInformation(customerInfo);
 
-      return customerInfo.entitlements.active?.[entitlementName] !== undefined;
+      return customerInfo.entitlements.active?.[latest.current.entitlementName] !== undefined;
     } catch (error) {
-      callbacks?.onError?.(errors.RESTORE_FAILED(error));
+      onError(errors.RESTORE_FAILED(error));
 
       return false;
     }
-  }, [entitlementName, updateCustomerInformation, callbacks]);
+  }, [updateCustomerInformation, onError]);
 
   const value = useMemo<PlutusContextValue>(
     () => ({
       isPro,
       isInTrial,
       isReady,
+      isCustomerInfoLoaded,
+      expirationDate,
+      initError,
       managementURL,
       purchasePackage,
       restorePurchases,
       translations,
-      onTrackEvent: callbacks?.onTrackEvent,
-      onError: callbacks?.onError,
+      onTrackEvent,
+      onError,
       offeringsConfig,
     }),
     [
       isPro,
       isInTrial,
       isReady,
+      isCustomerInfoLoaded,
+      expirationDate,
+      initError,
       managementURL,
       purchasePackage,
       restorePurchases,
       translations,
-      callbacks?.onTrackEvent,
-      callbacks?.onError,
+      onTrackEvent,
+      onError,
       offeringsConfig,
     ],
   );

@@ -21,15 +21,16 @@ import { PlutusProvider } from "@byarcadia-app/plutus";
 
 ## Callbacks
 
-| Callback                | Type                                                                          | Description                                                |
-| ----------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `onError`               | `(error: PlutusError) => void`                                                | Called on SDK errors (init, purchase, offerings, restore). |
-| `onCustomerInfoUpdated` | `(info: CustomerInfo, state: { isPro: boolean; isInTrial: boolean }) => void` | Called when RevenueCat customer info changes.              |
-| `onTrackEvent`          | `(name: string, params?: Record<string, unknown>) => void`                    | Analytics event callback — used as fallback by all hooks.  |
+| Callback                | Type                                                                                                          | Description                                                                                  |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| `onError`               | `(error: PlutusError) => void`                                                                                | Called on SDK errors (init, customer info, purchase, offerings, trial eligibility, restore). |
+| `onCustomerInfoUpdated` | `(info: CustomerInfo, state: { isPro: boolean; isInTrial: boolean; expirationDate: string \| null }) => void` | Called whenever customer info arrives, the start-up read included.                           |
+| `onTrackEvent`          | `(name: string, params?: Record<string, unknown>) => void`                                                    | Analytics event callback — every hook reports through it.                                    |
 
-## Callback hierarchy
+## Callbacks inline
 
-Hooks accept their own `onTrackEvent` callback. When provided, the hook-level callback takes precedence over the provider-level `onTrackEvent`. This lets you customize analytics per-screen while keeping a global fallback.
+Callbacks may be passed inline: the provider reads the latest ones through a ref and configures
+RevenueCat once per `apiKey` and `logLevel`.
 
 ## PlutusError shape
 
@@ -37,20 +38,26 @@ Hooks accept their own `onTrackEvent` callback. When provided, the hook-level ca
 interface PlutusError {
   code: PlutusErrorCode;
   message: string;
-  cause?: Error;
+  cause?: unknown;
 }
 
-type PlutusErrorCode = "INIT_FAILED" | "OFFERINGS_FAILED" | "PURCHASE_FAILED" | "RESTORE_FAILED";
+type PlutusErrorCode =
+  | "INIT_FAILED"
+  | "CUSTOMER_INFO_FAILED"
+  | "PURCHASE_FAILED"
+  | "OFFERINGS_FAILED"
+  | "TRIAL_ELIGIBILITY_FAILED"
+  | "RESTORE_FAILED";
 ```
 
 ## Available hooks (require PlutusProvider ancestor)
 
-| Hook                 | Purpose                                                |
-| -------------------- | ------------------------------------------------------ |
-| `usePlutus()`        | Core state: isPro, isInTrial, isReady, purchasePackage |
-| `useOfferings()`     | Load offerings with trial detection and discount calc  |
-| `usePaywall()`       | Purchase flow orchestration for main paywall           |
-| `useRescuePaywall()` | Purchase flow for rescue/discount offers               |
+| Hook                 | Purpose                                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------------------------- |
+| `usePlutus()`        | Core state: isPro, isInTrial, isReady, isCustomerInfoLoaded, expirationDate, initError, purchasePackage |
+| `useOfferings()`     | Load offerings with trial eligibility, discount calc, error and refetch                                 |
+| `usePaywall()`       | Purchase flow orchestration for main paywall                                                            |
+| `useRescuePaywall()` | Purchase flow for rescue/discount offers                                                                |
 
 ## Minimal setup
 

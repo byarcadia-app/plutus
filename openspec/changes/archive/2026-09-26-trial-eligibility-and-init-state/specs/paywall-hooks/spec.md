@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: usePaywall orchestrates standard paywall purchase flow
 
@@ -38,20 +38,6 @@ The `usePaywall` hook SHALL accept `monthlyOffer`, `annualOffer` (both `Purchase
 
 - **WHEN** `handleSubscriptionTypeChange("monthly")` is called
 - **THEN** `subscriptionType` SHALL update to `"monthly"` and `onTrackEvent` SHALL be called with event name and type
-
-### Requirement: usePaywall exposes legal link handlers
-
-The hook SHALL accept `termsUrl` and `privacyUrl` strings in its config. It SHALL expose `handleTermsPress` and `handlePrivacyPress` that open these URLs via `Linking.openURL` and call `onTrackEvent`.
-
-#### Scenario: Terms link pressed
-
-- **WHEN** `handleTermsPress` is called and `termsUrl` is provided
-- **THEN** the URL SHALL be opened via `Linking.openURL` and `onTrackEvent("paywall_terms_pressed")` SHALL be called
-
-#### Scenario: Privacy link pressed
-
-- **WHEN** `handlePrivacyPress` is called and `privacyUrl` is provided
-- **THEN** the URL SHALL be opened via `Linking.openURL` and `onTrackEvent("paywall_privacy_pressed")` SHALL be called
 
 ### Requirement: useRescuePaywall orchestrates rescue offer purchase flow
 

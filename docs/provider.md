@@ -18,7 +18,7 @@ import { PlutusProvider } from "@byarcadia-app/plutus";
   offerings={{ default: "default", rescue: "rescue" }}
   callbacks={{
     onError: (error) => console.error(error.code, error.message),
-    onCustomerInfoUpdated: (info, { isPro, isInTrial }) => {
+    onCustomerInfoUpdated: (info, { isPro, isInTrial, expirationDate }) => {
       analytics.setUserProperty("is_pro", isPro);
     },
     onTrackEvent: (name, params) => analytics.track(name, params),
@@ -46,12 +46,22 @@ import { PlutusProvider } from "@byarcadia-app/plutus";
 
 ### Callbacks
 
-| Callback                | Type                                                                          | Description                                               |
-| ----------------------- | ----------------------------------------------------------------------------- | --------------------------------------------------------- |
-| `onError`               | `(error: PlutusError) => void`                                                | Called on SDK errors (init, purchase, offerings, restore) |
-| `onCustomerInfoUpdated` | `(info: CustomerInfo, state: { isPro: boolean; isInTrial: boolean }) => void` | Called when RevenueCat customer info changes              |
-| `onTrackEvent`          | `(name: string, params?: Record<string, unknown>) => void`                    | Analytics event callback — used as fallback by all hooks  |
+| Callback                | Type                                                                                                          | Description                                                       |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `onError`               | `(error: PlutusError) => void`                                                                                | Called on SDK errors — see [Errors](./errors.md) for every code   |
+| `onCustomerInfoUpdated` | `(info: CustomerInfo, state: { isPro: boolean; isInTrial: boolean; expirationDate: string \| null }) => void` | Called whenever customer info arrives, the start-up read included |
+| `onTrackEvent`          | `(name: string, params?: Record<string, unknown>) => void`                                                    | Analytics event callback — every hook reports through it          |
 
-### Callback Hierarchy
+Callbacks may be passed inline. The provider reads the latest ones through a ref, so a new callbacks
+object never re-initializes RevenueCat.
 
-Hooks accept their own `onTrackEvent` callback. When provided, the hook-level callback takes precedence over the provider-level `onTrackEvent`. This lets you customize analytics per-screen while keeping a global fallback.
+## Initialization
+
+The provider configures RevenueCat once per `apiKey` and `logLevel`, then reads the person's customer
+info right away:
+
+1. `isReady` turns `true` when the SDK is configured — `useOfferings` starts loading then.
+2. `isCustomerInfoLoaded` turns `true` when customer info arrives — from the start-up read or from
+   the SDK's listener, whichever comes first. A start-up read overtaken by the listener is dropped.
+3. If the SDK cannot start (empty `apiKey`, or `configure` throws), `initError` holds the
+   `INIT_FAILED` error and `isReady` stays `false`; `useOfferings` then stops loading and reports it.

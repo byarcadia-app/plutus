@@ -13,8 +13,8 @@ Named after the Greek god of wealth — Plutus wraps RevenueCat so you can set u
 ## What it does
 
 - **[PlutusProvider](docs/provider.md)** — RevenueCat SDK initialization, customer info listener, entitlement state management
-- **[usePlutus](docs/hooks.md#useplutus)** — Access `isPro`, `isInTrial`, `isReady`, `managementURL`, `purchasePackage`, `restorePurchases`
-- **[useOfferings](docs/hooks.md#useofferings)** — Load offerings with configurable identifiers, per-package trial detection, computed discount percentages
+- **[usePlutus](docs/hooks.md#useplutus)** — Access `isPro`, `isInTrial`, `isReady`, `isCustomerInfoLoaded`, `expirationDate`, `initError`, `managementURL`, `purchasePackage`, `restorePurchases`
+- **[useOfferings](docs/hooks.md#useofferings)** — Load offerings with configurable identifiers, trial eligibility per person, computed discount percentages, `error` and `refetch`
 - **[usePaywall](docs/hooks.md#usepaywall)** — Purchase flow orchestration with subscription type selection, configurable callbacks
 - **[useRescuePaywall](docs/hooks.md#userescuepaywall)** — Rescue/discount offer purchase flow
 - **[Translations](docs/translations.md)** — English fallback strings, override with `Partial<PlutusTranslations>`

@@ -3,7 +3,8 @@ import { useRouter } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 
 export default function HomeScreen() {
-  const { isPro, isInTrial, isReady } = usePlutus();
+  const { isPro, isInTrial, isReady, isCustomerInfoLoaded, expirationDate, initError } =
+    usePlutus();
   const router = useRouter();
 
   return (
@@ -26,11 +27,32 @@ export default function HomeScreen() {
               </Text>
             </View>
             <View className="flex-row justify-between">
-              <Text className="text-sm font-inter text-muted-foreground">Status</Text>
+              <Text className="text-sm font-inter text-muted-foreground">Customer Info</Text>
               <Text className="text-sm font-interMedium text-foreground">
-                {isPro ? (isInTrial ? "Trial" : "Pro") : "Free"}
+                {isCustomerInfoLoaded ? "Loaded" : "Waiting"}
               </Text>
             </View>
+            <View className="flex-row justify-between">
+              <Text className="text-sm font-inter text-muted-foreground">Status</Text>
+              <Text className="text-sm font-interMedium text-foreground">
+                {isCustomerInfoLoaded ? (isPro ? (isInTrial ? "Trial" : "Pro") : "Free") : "—"}
+              </Text>
+            </View>
+            {expirationDate && (
+              <View className="flex-row justify-between">
+                <Text className="text-sm font-inter text-muted-foreground">
+                  {isInTrial ? "Trial ends" : "Renews or ends"}
+                </Text>
+                <Text className="text-sm font-interMedium text-foreground">
+                  {new Date(expirationDate).toLocaleDateString()}
+                </Text>
+              </View>
+            )}
+            {initError && (
+              <Text className="text-sm font-inter text-danger">
+                RevenueCat did not start: {initError.code}
+              </Text>
+            )}
           </View>
         </View>
 

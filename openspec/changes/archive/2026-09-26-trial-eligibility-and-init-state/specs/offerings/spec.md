@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: useOfferings loads RevenueCat offerings
 
@@ -68,33 +68,7 @@ The hook SHALL expose `monthlyHasTrial` and `annualHasTrial`. A package has a tr
 - **WHEN** `annualOffer` is `undefined`
 - **THEN** `annualHasTrial` SHALL be `false`
 
-### Requirement: useOfferings computes discount percentages
-
-The hook SHALL compute and expose `annualDiscountPercentage` comparing monthly-to-annual price, and `rescueOffsetDiscountPercentage` comparing rescue-to-annual price. Both SHALL be `number | undefined`.
-
-#### Scenario: Annual discount calculation
-
-- **WHEN** both monthly and annual offers are available and monthly yearly cost exceeds annual yearly cost
-- **THEN** `annualDiscountPercentage` SHALL be the floored percentage savings (e.g., `50` for 50% off)
-
-#### Scenario: No discount available
-
-- **WHEN** monthly yearly cost is less than or equal to annual yearly cost, or either offer is missing
-- **THEN** `annualDiscountPercentage` SHALL be `undefined`
-
-#### Scenario: Rescue discount calculation
-
-- **WHEN** both rescue and annual offers are available and rescue yearly cost is less than annual yearly cost
-- **THEN** `rescueOffsetDiscountPercentage` SHALL be the floored percentage savings
-
-### Requirement: useOfferings refetches on key change
-
-The hook SHALL accept an optional `refetchKey` (string or number). When this value changes, offerings SHALL be refetched. This allows consumers to trigger refetch on date change or other app-level events.
-
-#### Scenario: Refetch on key change
-
-- **WHEN** `refetchKey` changes from `"2024-01-01"` to `"2024-01-02"`
-- **THEN** offerings SHALL be refetched from RevenueCat
+## ADDED Requirements
 
 ### Requirement: useOfferings exposes its error and a refetch
 

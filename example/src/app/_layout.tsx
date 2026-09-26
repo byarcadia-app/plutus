@@ -1,5 +1,6 @@
 import { AetherProvider, useInterFonts, useNavigationTheme } from "@byarcadia-app/aether";
 import { PlutusProvider } from "@byarcadia-app/plutus";
+import { LOG_LEVEL } from "react-native-purchases";
 import { ThemeProvider } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -34,6 +35,8 @@ export default function RootLayout() {
       <PlutusProvider
         apiKey={process.env.EXPO_PUBLIC_REVENUECAT_KEY ?? ""}
         entitlementName="Pro"
+        logLevel={__DEV__ ? LOG_LEVEL.DEBUG : LOG_LEVEL.ERROR}
+        // Inline on purpose: the provider must configure RevenueCat once however often this renders.
         callbacks={{
           onError: (error) => console.warn("[Plutus Error]", error.code, error.cause),
           onTrackEvent: (name, params) => console.log("[Plutus Event]", name, params),

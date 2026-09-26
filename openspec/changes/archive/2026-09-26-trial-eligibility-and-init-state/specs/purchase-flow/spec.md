@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: purchasePackage executes a purchase and returns result
 
@@ -18,17 +18,3 @@ The `purchasePackage` function exposed by `usePlutus` SHALL accept a `PurchasesP
 
 - **WHEN** a non-cancellation purchase error occurs
 - **THEN** the `callbacks.onError` callback SHALL be called with an error of `code: "PURCHASE_FAILED"` carrying the `PurchasesError` as `cause` and the attempted `PurchasesPackage` as `package`, and the function SHALL return `false`
-
-### Requirement: restorePurchases restores previous purchases
-
-The `restorePurchases` function exposed by `usePlutus` SHALL call `Purchases.restorePurchases()` and return `true` if the configured entitlement is found in the restored customer info, `false` otherwise.
-
-#### Scenario: Successful restore with active entitlement
-
-- **WHEN** `restorePurchases` is called and the restored customer info contains the configured entitlement
-- **THEN** it SHALL return `true` and update `isPro` to `true`
-
-#### Scenario: Restore with no active entitlement
-
-- **WHEN** `restorePurchases` is called and the restored customer info does not contain the configured entitlement
-- **THEN** it SHALL return `false` and `isPro` SHALL remain unchanged

@@ -1,4 +1,4 @@
-## ADDED Requirements
+## MODIFIED Requirements
 
 ### Requirement: PlutusProvider initializes RevenueCat SDK
 
@@ -53,48 +53,6 @@ The provider SHALL register a `customerInfoUpdateListener` on mount and remove i
 - **WHEN** customer info updates
 - **THEN** the `callbacks.onCustomerInfoUpdated` callback SHALL be called with the `CustomerInfo` object and the derived state (`isPro`, `isInTrial`, `expirationDate`)
 
-### Requirement: Provider configures offering identifiers
-
-The `PlutusConfig` SHALL accept an optional `offerings` object with `default` (string, defaults to `"default"`) and `rescue` (string, defaults to `"rescue"`) properties. These identifiers SHALL be used by `useOfferings` to resolve the correct offerings from RevenueCat.
-
-#### Scenario: Custom offering identifiers
-
-- **WHEN** `offerings: { default: "premium", rescue: "win-back" }` is provided
-- **THEN** `useOfferings` SHALL look up `offerings.all["premium"]` and `offerings.all["win-back"]`
-
-#### Scenario: Default offering identifiers
-
-- **WHEN** no `offerings` config is provided
-- **THEN** `useOfferings` SHALL look up `offerings.all["default"]` and `offerings.all["rescue"]`
-
-### Requirement: Provider supports fallback translations with overrides
-
-The `PlutusConfig` SHALL accept an optional `translations` of type `Partial<PlutusTranslations>`. Plutus SHALL ship English defaults for all consumer-facing strings. Any key provided in `translations` SHALL override the English default.
-
-#### Scenario: Default English translations
-
-- **WHEN** no `translations` config is provided
-- **THEN** all consumer-facing strings SHALL use English defaults
-
-#### Scenario: Partial translation override
-
-- **WHEN** `translations: { purchaseError: { title: "Błąd zakupu" } }` is provided
-- **THEN** `purchaseError.title` SHALL use the provided Polish string while all other strings SHALL use English defaults
-
-### Requirement: Provider exposes global onTrackEvent callback
-
-The `PlutusConfig.callbacks` SHALL accept an optional `onTrackEvent(name: string, params?: Record<string, unknown>)` callback. This callback SHALL be used as a default by all hooks unless overridden at the hook level.
-
-#### Scenario: Global tracking callback used by hooks
-
-- **WHEN** `callbacks.onTrackEvent` is set on the provider and `usePaywall` does not provide its own `onTrackEvent`
-- **THEN** paywall events SHALL be reported through the provider-level `onTrackEvent`
-
-#### Scenario: Hook-level tracking override
-
-- **WHEN** both provider and `usePaywall` define `onTrackEvent`
-- **THEN** the hook-level `onTrackEvent` SHALL be used instead of the provider-level one
-
 ### Requirement: usePlutus hook provides context access
 
 The `usePlutus` hook SHALL return the provider's state and actions: `isPro`, `isInTrial`, `isReady`, `isCustomerInfoLoaded`, `expirationDate`, `initError`, `managementURL`, `purchasePackage`, `restorePurchases`, and `translations`. It SHALL throw an error if used outside of `PlutusProvider`.
@@ -108,3 +66,9 @@ The `usePlutus` hook SHALL return the provider's state and actions: `isPro`, `is
 
 - **WHEN** `usePlutus` is called outside of a `PlutusProvider`
 - **THEN** it SHALL throw an error with a descriptive message
+
+## REMOVED Requirements
+
+### Requirement: Provider accepts platform-specific configuration
+
+**Reason:** `simplify-api-surface` (2026-03-12) made `apiKey` a string and removed the platform branch; the spec never followed. **Migration:** pass the platform's key as a string.
