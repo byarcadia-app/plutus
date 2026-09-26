@@ -1,4 +1,5 @@
 import {
+  INTRO_ELIGIBILITY_STATUS,
   PACKAGE_TYPE,
   PRODUCT_CATEGORY,
   PRODUCT_TYPE,
@@ -6,6 +7,7 @@ import {
 } from "react-native-purchases";
 import type {
   CustomerInfo,
+  IntroEligibility,
   MakePurchaseResult,
   PurchasesEntitlementInfo,
   PurchasesError,
@@ -259,4 +261,12 @@ export function purchasesError(code: PURCHASES_ERROR_CODE): PurchasesError {
     underlyingErrorMessage: "",
     userCancelled: cancelled,
   };
+}
+
+/** The store's answer for one product, keyed the way the SDK returns it. */
+export function eligibility(
+  productIdentifier: string,
+  status: INTRO_ELIGIBILITY_STATUS,
+): Record<string, IntroEligibility> {
+  return { [productIdentifier]: { status, description: "" } };
 }

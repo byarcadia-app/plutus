@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Purchases, { type PurchasesPackage } from "react-native-purchases";
+import { Platform } from "react-native";
+import Purchases, { INTRO_ELIGIBILITY_STATUS, type PurchasesPackage } from "react-native-purchases";
 
 import { errors, type PlutusError } from "../errors";
 import { usePlutus } from "../provider/use-plutus";
@@ -8,9 +9,38 @@ interface UseOfferingsOptions {
   refetchKey?: string | number;
 }
 
-const hasFreeTrial = (offer?: PurchasesPackage): boolean => {
-  if (!offer?.product?.introPrice) return false;
-  return offer.product.introPrice.price === 0;
+const hasFreeIntroPrice = (offer?: PurchasesPackage): offer is PurchasesPackage =>
+  offer?.product?.introPrice?.price === 0;
+
+/**
+ * The product identifiers whose free trial this person can still get. On iOS only the store knows
+ * whether an intro offer was used; the SDK answers UNKNOWN elsewhere, so a free intro price decides.
+ */
+const findTrials = async (
+  offers: (PurchasesPackage | undefined)[],
+  onError?: (error: PlutusError) => void,
+): Promise<Set<string>> => {
+  const identifiers = offers.filter(hasFreeIntroPrice).map((offer) => offer.product.identifier);
+
+  if (Platform.OS !== "ios" || identifiers.length === 0) {
+    return new Set(identifiers);
+  }
+
+  try {
+    const eligibility = await Purchases.checkTrialOrIntroductoryPriceEligibility(identifiers);
+
+    return new Set(
+      identifiers.filter(
+        (identifier) =>
+          eligibility[identifier]?.status ===
+          INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE,
+      ),
+    );
+  } catch (cause) {
+    onError?.(errors.TRIAL_ELIGIBILITY_FAILED(cause));
+
+    return new Set();
+  }
 };
 
 const calculateAnnualDiscount = (
@@ -59,12 +89,17 @@ interface Offers {
   monthlyOffer?: PurchasesPackage;
   annualOffer?: PurchasesPackage;
   rescueOffer?: PurchasesPackage;
+  monthlyHasTrial: boolean;
+  annualHasTrial: boolean;
 }
+
+const NO_OFFERS: Offers = { monthlyHasTrial: false, annualHasTrial: false };
 
 export const useOfferings = (options?: UseOfferingsOptions) => {
   const { isReady, initError, offeringsConfig, onError } = usePlutus();
 
-  const [{ monthlyOffer, annualOffer, rescueOffer }, setOffers] = useState<Offers>({});
+  const [{ monthlyOffer, annualOffer, rescueOffer, monthlyHasTrial, annualHasTrial }, setOffers] =
+    useState<Offers>(NO_OFFERS);
   // Starts true: until the SDK is ready and the first fetch settles, there is nothing to show yet.
   const [isFetching, setIsFetching] = useState(true);
   const [error, setError] = useState<PlutusError | null>(null);
@@ -89,10 +124,20 @@ export const useOfferings = (options?: UseOfferingsOptions) => {
         const defaultPackages = offerings?.all?.[offeringsConfig.default]?.availablePackages;
         const rescuePackages = offerings?.all?.[offeringsConfig.rescue]?.availablePackages;
 
+        const monthly = defaultPackages?.find((pkg) => pkg.packageType === "MONTHLY");
+        const annual = defaultPackages?.find((pkg) => pkg.packageType === "ANNUAL");
+        const trials = await findTrials([monthly, annual], onError);
+
+        if (!isCurrent) {
+          return;
+        }
+
         setOffers({
-          monthlyOffer: defaultPackages?.find((pkg) => pkg.packageType === "MONTHLY"),
-          annualOffer: defaultPackages?.find((pkg) => pkg.packageType === "ANNUAL"),
+          monthlyOffer: monthly,
+          annualOffer: annual,
           rescueOffer: rescuePackages?.find((pkg) => pkg.packageType === "ANNUAL"),
+          monthlyHasTrial: monthly !== undefined && trials.has(monthly.product.identifier),
+          annualHasTrial: annual !== undefined && trials.has(annual.product.identifier),
         });
         setError(null);
       } catch (cause) {
@@ -117,10 +162,6 @@ export const useOfferings = (options?: UseOfferingsOptions) => {
   }, [isReady, offeringsConfig, onError, options?.refetchKey, attempt]);
 
   const refetch = useCallback(() => setAttempt((count) => count + 1), []);
-
-  const monthlyHasTrial = useMemo(() => hasFreeTrial(monthlyOffer), [monthlyOffer]);
-
-  const annualHasTrial = useMemo(() => hasFreeTrial(annualOffer), [annualOffer]);
 
   const annualDiscountPercentage = useMemo(
     () => calculateAnnualDiscount(monthlyOffer, annualOffer),

@@ -5,6 +5,7 @@ export type PlutusErrorCode =
   | "CUSTOMER_INFO_FAILED"
   | "PURCHASE_FAILED"
   | "OFFERINGS_FAILED"
+  | "TRIAL_ELIGIBILITY_FAILED"
   | "RESTORE_FAILED";
 
 export interface PlutusError {
@@ -34,6 +35,11 @@ export const errors = {
   OFFERINGS_FAILED: (cause: unknown): PlutusError => ({
     code: "OFFERINGS_FAILED",
     message: "Failed to load offerings",
+    cause,
+  }),
+  TRIAL_ELIGIBILITY_FAILED: (cause: unknown): PlutusError => ({
+    code: "TRIAL_ELIGIBILITY_FAILED",
+    message: "Failed to check trial eligibility",
     cause,
   }),
   RESTORE_FAILED: (cause: unknown): PlutusError => ({
