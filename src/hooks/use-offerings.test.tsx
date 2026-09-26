@@ -1,4 +1,4 @@
-import { waitFor } from "@testing-library/react";
+import { act, waitFor } from "@testing-library/react";
 import Purchases from "react-native-purchases";
 import type { PurchasesOfferings } from "react-native-purchases";
 import { describe, expect, it, vi } from "vitest";
@@ -102,14 +102,58 @@ describe("useOfferings", () => {
     expect(result.current.rescueOffsetDiscountPercentage).toBeUndefined();
   });
 
-  it("0.1.1 behaviour — changes in 0.2.0: the first frame reads not loading with no offers", async () => {
+  it("reads as loading from the first frame until the offers arrive", async () => {
     vi.mocked(Purchases.getOfferings).mockResolvedValue(standardOfferings());
 
     const { result } = renderInPlutus(() => useOfferings());
 
-    expect(result.current.isLoading).toBe(false);
+    expect(result.current.isLoading).toBe(true);
     expect(result.current.annualOffer).toBeUndefined();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.annualOffer).toBeDefined();
+    expect(result.current.error).toBeNull();
+  });
+
+  it("stops loading and hands over the init error when the SDK never started", async () => {
+    const { result } = renderInPlutus(() => useOfferings(), { apiKey: "" });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.error).toMatchObject({ code: "INIT_FAILED" });
+    expect(Purchases.getOfferings).not.toHaveBeenCalled();
+  });
+
+  it("fetches again on refetch and clears the error once it succeeds", async () => {
+    vi.mocked(Purchases.getOfferings)
+      .mockRejectedValueOnce(new Error("network"))
+      .mockResolvedValueOnce(standardOfferings());
+
+    const { result } = renderInPlutus(() => useOfferings());
+    await waitFor(() => expect(result.current.error).toMatchObject({ code: "OFFERINGS_FAILED" }));
+
+    act(() => result.current.refetch());
+
     await waitFor(() => expect(result.current.annualOffer).toBeDefined());
+    expect(result.current.error).toBeNull();
+    expect(Purchases.getOfferings).toHaveBeenCalledTimes(2);
+  });
+
+  it("ignores a fetch that settles after a newer one", async () => {
+    const stale = deferred<PurchasesOfferings>();
+    vi.mocked(Purchases.getOfferings)
+      .mockReturnValueOnce(stale.promise)
+      .mockResolvedValueOnce(standardOfferings());
+    let refetchKey = 1;
+
+    const { rerender, result } = renderInPlutus(() => useOfferings({ refetchKey }));
+    await waitFor(() => expect(Purchases.getOfferings).toHaveBeenCalledOnce());
+    refetchKey = 2;
+    rerender();
+    await waitFor(() => expect(result.current.monthlyOffer).toBeDefined());
+
+    await act(async () => stale.resolve(offerings(offering("default", [annualPackage()]))));
+
+    expect(result.current.monthlyOffer).toBeDefined();
+    expect(result.current.isLoading).toBe(false);
   });
 
   it("is loading while the fetch is in flight and settles after it", async () => {
@@ -136,6 +180,7 @@ describe("useOfferings", () => {
     );
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.annualOffer).toBeUndefined();
+    expect(result.current.error).toMatchObject({ code: "OFFERINGS_FAILED" });
   });
 
   it("fetches again when the refetch key changes", async () => {

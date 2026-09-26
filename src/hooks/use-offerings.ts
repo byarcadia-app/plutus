@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Purchases, { type PurchasesPackage } from "react-native-purchases";
 
-import { errors } from "../errors";
+import { errors, type PlutusError } from "../errors";
 import { usePlutus } from "../provider/use-plutus";
 
 interface UseOfferingsOptions {
@@ -55,40 +55,68 @@ const calculateRescueOffsetDiscount = (
   return Math.floor(discountPercentage);
 };
 
+interface Offers {
+  monthlyOffer?: PurchasesPackage;
+  annualOffer?: PurchasesPackage;
+  rescueOffer?: PurchasesPackage;
+}
+
 export const useOfferings = (options?: UseOfferingsOptions) => {
-  const { isReady, offeringsConfig, onError } = usePlutus();
+  const { isReady, initError, offeringsConfig, onError } = usePlutus();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [monthlyOffer, setMonthlyOffer] = useState<PurchasesPackage | undefined>();
-  const [annualOffer, setAnnualOffer] = useState<PurchasesPackage | undefined>();
-  const [rescueOffer, setRescueOffer] = useState<PurchasesPackage | undefined>();
-
-  const loadOfferings = async () => {
-    try {
-      const offerings = await Purchases.getOfferings();
-
-      const defaultPackages = offerings?.all?.[offeringsConfig.default]?.availablePackages;
-      const rescuePackages = offerings?.all?.[offeringsConfig.rescue]?.availablePackages;
-
-      setMonthlyOffer(
-        defaultPackages?.find((pkg: PurchasesPackage) => pkg.packageType === "MONTHLY"),
-      );
-      setAnnualOffer(
-        defaultPackages?.find((pkg: PurchasesPackage) => pkg.packageType === "ANNUAL"),
-      );
-      setRescueOffer(rescuePackages?.find((pkg: PurchasesPackage) => pkg.packageType === "ANNUAL"));
-    } catch (error) {
-      onError?.(errors.OFFERINGS_FAILED(error));
-    }
-  };
+  const [{ monthlyOffer, annualOffer, rescueOffer }, setOffers] = useState<Offers>({});
+  // Starts true: until the SDK is ready and the first fetch settles, there is nothing to show yet.
+  const [isFetching, setIsFetching] = useState(true);
+  const [error, setError] = useState<PlutusError | null>(null);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    if (isReady) {
-      setIsLoading(true);
-      loadOfferings().finally(() => setIsLoading(false));
+    if (!isReady) {
+      return;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isReady, options?.refetchKey]);
+
+    let isCurrent = true;
+    setIsFetching(true);
+
+    const loadOfferings = async () => {
+      try {
+        const offerings = await Purchases.getOfferings();
+
+        if (!isCurrent) {
+          return;
+        }
+
+        const defaultPackages = offerings?.all?.[offeringsConfig.default]?.availablePackages;
+        const rescuePackages = offerings?.all?.[offeringsConfig.rescue]?.availablePackages;
+
+        setOffers({
+          monthlyOffer: defaultPackages?.find((pkg) => pkg.packageType === "MONTHLY"),
+          annualOffer: defaultPackages?.find((pkg) => pkg.packageType === "ANNUAL"),
+          rescueOffer: rescuePackages?.find((pkg) => pkg.packageType === "ANNUAL"),
+        });
+        setError(null);
+      } catch (cause) {
+        const failure = errors.OFFERINGS_FAILED(cause);
+        onError?.(failure);
+
+        if (isCurrent) {
+          setError(failure);
+        }
+      } finally {
+        if (isCurrent) {
+          setIsFetching(false);
+        }
+      }
+    };
+
+    loadOfferings();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [isReady, offeringsConfig, onError, options?.refetchKey, attempt]);
+
+  const refetch = useCallback(() => setAttempt((count) => count + 1), []);
 
   const monthlyHasTrial = useMemo(() => hasFreeTrial(monthlyOffer), [monthlyOffer]);
 
@@ -105,7 +133,10 @@ export const useOfferings = (options?: UseOfferingsOptions) => {
   );
 
   return {
-    isLoading,
+    // A provider that failed to start never becomes ready, so it must not leave the caller waiting.
+    isLoading: initError ? false : isFetching,
+    error: initError ?? error,
+    refetch,
     monthlyOffer,
     annualOffer,
     rescueOffer,
