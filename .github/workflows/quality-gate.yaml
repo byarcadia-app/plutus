@@ -23,6 +23,7 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
+      - run: pnpm test
       - run: pnpm lint
       - run: pnpm build
       - run: pnpm fmt:check

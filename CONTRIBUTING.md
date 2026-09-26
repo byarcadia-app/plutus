@@ -47,10 +47,11 @@ pnpm install
 
 ### Verification
 
-Make sure your code passes type checking and linting before submitting:
+Make sure your code passes type checking, tests and linting before submitting:
 
 ```sh
-pnpm check    # TypeScript (tsc --noEmit)
+pnpm check    # TypeScript (tsc --noEmit), for src and tests
+pnpm test     # vitest
 pnpm lint     # Lint with oxlint
 pnpm fmt:check # Check formatting with oxfmt
 ```
@@ -75,6 +76,7 @@ pnpm dev      # Build in watch mode
 | `pnpm build`     | Build with tsup (CJS + ESM + DTS) |
 | `pnpm dev`       | Build in watch mode               |
 | `pnpm check`     | TypeScript type checking          |
+| `pnpm test`      | Run the vitest suite              |
 | `pnpm lint`      | Lint with oxlint                  |
 | `pnpm fmt`       | Format with oxfmt                 |
 | `pnpm fmt:check` | Check formatting                  |
@@ -162,6 +164,7 @@ The changeset file is committed with your PR and consumed during the release pro
 ### PR Checklist
 
 - [ ] Code passes `pnpm check` (TypeScript)
+- [ ] Tests pass with `pnpm test`, and a bug fix carries a regression test
 - [ ] Code passes `pnpm lint` (oxlint)
 - [ ] Code passes `pnpm fmt:check` (oxfmt)
 - [ ] Build succeeds with `pnpm build`
