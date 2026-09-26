@@ -5,7 +5,7 @@ import { PlutusProvider } from "../src/provider/plutus-provider";
 import type { PlutusConfig } from "../src/types";
 import { ENTITLEMENT } from "./fixtures";
 
-type ProviderProps = Partial<PlutusConfig>;
+export type ProviderProps = Partial<PlutusConfig>;
 
 /**
  * Renders a hook inside a `PlutusProvider`. The props object is created once, so callbacks keep

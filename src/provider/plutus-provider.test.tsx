@@ -10,11 +10,11 @@ import {
   purchaseResult,
   purchasesError,
 } from "../../test/fixtures";
-import { renderInPlutus } from "../../test/render";
+import { renderInPlutus, type ProviderProps } from "../../test/render";
 import { PlutusProvider } from "./plutus-provider";
 import { usePlutus } from "./use-plutus";
 
-async function renderReady(props: Parameters<typeof renderInPlutus>[1] = {}) {
+async function renderReady(props: ProviderProps = {}) {
   const rendered = renderInPlutus(() => usePlutus(), props);
   await waitFor(() => expect(rendered.result.current.isReady).toBe(true));
 
