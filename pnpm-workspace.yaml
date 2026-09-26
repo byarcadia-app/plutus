@@ -1,3 +1,12 @@
 packages:
   - "."
   - "example"
+
+# Supply chain: a release must be seven days old before it may be installed, so a compromised
+# version is usually caught and pulled before it reaches this repo. `pnpm add <pkg>` for a
+# just-published version fails by design. One-shot bypass for a genuine hotfix:
+#   pnpm add -D <pkg> --config.minimumReleaseAge=0
+minimumReleaseAge: 10080
+
+# When no version in a range clears the age gate, fail instead of silently resolving an older one.
+minimumReleaseAgeStrict: true
