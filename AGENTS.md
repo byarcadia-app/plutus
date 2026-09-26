@@ -13,20 +13,29 @@ RevenueCat wrapper for React Native in-app purchases. Callback-driven, zero app-
 
 ## Scripts
 
-| Command          | Description                       |
-| ---------------- | --------------------------------- |
-| `pnpm build`     | Build with tsup (CJS + ESM + DTS) |
-| `pnpm dev`       | Build in watch mode               |
-| `pnpm check`     | TypeScript type checking          |
-| `pnpm lint`      | Lint with oxlint                  |
-| `pnpm fmt`       | Format with oxfmt                 |
-| `pnpm fmt:check` | Check formatting                  |
+| Command          | Description                            |
+| ---------------- | -------------------------------------- |
+| `pnpm build`     | Build with tsup (CJS + ESM + DTS)      |
+| `pnpm dev`       | Build in watch mode                    |
+| `pnpm check`     | TypeScript type checking (src + tests) |
+| `pnpm test`      | Run the vitest suite                   |
+| `pnpm lint`      | Lint with oxlint                       |
+| `pnpm fmt`       | Format with oxfmt                      |
+| `pnpm fmt:check` | Check formatting                       |
 
 ## Validation
 
 Before completing any task, run:
 
-    pnpm check && pnpm lint && pnpm fmt:check && pnpm build
+    pnpm check && pnpm test && pnpm lint && pnpm fmt:check && pnpm build
+
+## Tests
+
+- vitest + Testing Library on happy-dom; tests sit next to the code as `src/**/*.test.ts(x)`.
+- `react-native` and `react-native-purchases` are aliased to `test/react-native.ts` and
+  `test/fake-purchases.ts` (`vitest.config.mts`). Drive the SDK through `vi.mocked(Purchases.x)` and
+  `emitCustomerInfo`; build SDK objects with `test/fixtures.ts`, never with a cast.
+- A behaviour change flips the test that pins the old behaviour; it does not delete it.
 
 ## Changesets
 

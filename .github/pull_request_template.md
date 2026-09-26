@@ -26,6 +26,7 @@ Before submitting, please make sure:
 ## Checklist
 
 - [ ] `pnpm check` passes
+- [ ] `pnpm test` passes
 - [ ] `pnpm lint` passes
 - [ ] `pnpm fmt:check` passes
 - [ ] `pnpm build` succeeds
