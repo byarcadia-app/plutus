@@ -4,8 +4,8 @@ RevenueCat wrapper for React Native in-app purchases. Callback-driven, zero app-
 
 ## Tech Stack
 
-- TypeScript (strict), React 19, React Native 0.81
-- react-native-purchases v9+ (RevenueCat)
+- TypeScript (strict), React 19.2, React Native 0.86 — the versions `src/` is typechecked against
+- react-native-purchases v10 (RevenueCat) as the dev dependency; the peer range still starts at v9
 - tsup (CJS + ESM + DTS)
 - oxlint / oxfmt
 - changesets (versioning)
