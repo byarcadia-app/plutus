@@ -1,9 +1,13 @@
 ---
 name: plutus-setup
-description: Set up @byarcadia-app/plutus (RevenueCat wrapper) in a React Native app. Handles dependency installation, PlutusProvider integration into the root layout, environment variable configuration, and build verification. Use when the user wants to add in-app purchases, subscriptions, or a paywall to their React Native/Expo app using Plutus or RevenueCat, or when they say "set up plutus", "add subscriptions", "integrate payments", or "add IAP". Covers code-side setup only — for RevenueCat dashboard and App Store Connect configuration, refer the user to the Payment Setup guide in the plutus docs (docs/payment-setup.md in the plutus repo, or https://github.com/byarcadia-app/plutus/blob/main/docs/payment-setup.md).
+description: Deprecated — a new integration uses @byarcadia-app/payments instead. Set up @byarcadia-app/plutus (RevenueCat wrapper) in a React Native app. Handles dependency installation, PlutusProvider integration into the root layout, environment variable configuration, and build verification. Use when the user wants to add in-app purchases, subscriptions, or a paywall to their React Native/Expo app using Plutus or RevenueCat, or when they say "set up plutus", "add subscriptions", "integrate payments", or "add IAP". Covers code-side setup only — for RevenueCat dashboard and App Store Connect configuration, refer the user to the Payment Setup guide in the plutus docs (docs/payment-setup.md in the plutus repo, or https://github.com/byarcadia-app/plutus/blob/main/docs/payment-setup.md).
 ---
 
 # Plutus Setup
+
+> **Deprecated.** `@byarcadia-app/plutus` is no longer maintained. For a new integration, set up
+> [`@byarcadia-app/payments`](https://github.com/byarcadia-app/foundation/tree/main/packages/payments) from its README instead. Use this skill only in an app that
+> already depends on `@byarcadia-app/plutus`.
 
 Integrate `@byarcadia-app/plutus` into an existing React Native / Expo project. This skill handles the code-side wiring — installing the package, wrapping the app with PlutusProvider, and configuring environment variables. It does NOT cover RevenueCat dashboard or App Store Connect configuration (that's a manual process documented in the [Payment Setup guide](https://github.com/byarcadia-app/plutus/blob/main/docs/payment-setup.md)).
 

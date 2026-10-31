@@ -1,12 +1,19 @@
 <h1 align="center">@byarcadia-app/plutus</h1>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@byarcadia-app/plutus"><img src="https://img.shields.io/npm/v/@byarcadia-app/plutus?style=flat" alt="npm version" /></a>&nbsp;<a href="https://github.com/byarcadia-app/plutus/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@byarcadia-app/plutus?style=flat" alt="License" /></a>&nbsp;<img src="https://img.shields.io/badge/platform-iOS-black?style=flat" alt="iOS only" />&nbsp;<img src="https://img.shields.io/badge/status-alpha-orange?style=flat" alt="Alpha" />
+  <a href="https://www.npmjs.com/package/@byarcadia-app/plutus"><img src="https://img.shields.io/npm/v/@byarcadia-app/plutus?style=flat" alt="npm version" /></a>&nbsp;<a href="https://github.com/byarcadia-app/plutus/blob/main/LICENSE"><img src="https://img.shields.io/npm/l/@byarcadia-app/plutus?style=flat" alt="License" /></a>&nbsp;<img src="https://img.shields.io/badge/platform-iOS-black?style=flat" alt="iOS only" />&nbsp;<img src="https://img.shields.io/badge/status-deprecated-red?style=flat" alt="Deprecated" />
 </p>
 
 <p align="center">
   Reusable <a href="https://www.revenuecat.com/">RevenueCat</a> wrapper for <a href="https://reactnative.dev/">React Native</a> in-app purchases — configurable, callback-driven, zero app-specific dependencies.
 </p>
+
+> [!WARNING]
+> **Deprecated.** `@byarcadia-app/plutus` is no longer maintained. Its successor is
+> [`@byarcadia-app/payments`](https://github.com/byarcadia-app/foundation/tree/main/packages/payments) in [byarcadia-app/foundation](https://github.com/byarcadia-app/foundation),
+> first released as [`@byarcadia-app/payments@0.2.0`](https://github.com/byarcadia-app/foundation/releases/tag/%40byarcadia-app%2Fpayments%400.2.0). It replaces
+> `@byarcadia-app/plutus@0.2.0` and names each `Plutus*` export `Payments*`; its README covers the
+> setup.
 
 Named after the Greek god of wealth — Plutus wraps RevenueCat so you can set up in-app purchases once and reuse across projects.
 
